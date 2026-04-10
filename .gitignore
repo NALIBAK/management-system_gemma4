@@ -1,0 +1,23 @@
+# Node.js
+Main/whatsapp_service/node_modules/
+Main/whatsapp_service/whatsapp_auth/
+Main/whatsapp_service/.wwebjs_auth/
+Main/whatsapp_service/.wwebjs_cache/
+Main/whatsapp_service/package-lock.json
+
+# Python
+__pycache__/
+*.pyc
+.env
+.venv/
+env/
+venv/
+Main/Backend/reports_archive/
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# OS generated files
+.DS_Store
+Thumbs.db

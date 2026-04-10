@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses — CMS</title>
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/aira.css">
+</head>
+
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">🎓</div>
+                <div class="logo-text">CMS <span>College Management</span></div>
+            </div>
+            <nav class="sidebar-nav"></nav>
+        </aside>
+        <div class="main-content">
+            <header class="header" id="page-header"></header>
+            <main class="page-content">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('courses')">📚 Courses</button>
+                    <button class="tab-btn" onclick="switchTab('subjects')">📖 Subjects</button>
+                </div>
+
+                <div id="tab-courses">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">📚 Courses</h3>
+                            <button class="btn btn-primary btn-sm" onclick="utils.openModal('course-modal')">➕ Add
+                                Course</button>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Name</th>
+                                        <th>Department</th>
+                                        <th>Semesters</th>
+                                        <th>Degree</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="courses-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-subjects" style="display:none">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">📖 Subjects</h3>
+                            <button class="btn btn-primary btn-sm" onclick="utils.openModal('subject-modal')">➕ Add
+                                Subject</button>
+                        </div>
+                        <div class="card-body" style="padding-bottom:0">
+                            <div class="flex gap-3">
+                                <select class="form-control" id="filter-course" style="width:250px"
+                                    onchange="loadSubjects()">
+                                    <option value="">All Courses</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Name</th>
+                                        <th>Course</th>
+                                        <th>Semester</th>
+                                        <th>Credits</th>
+                                        <th>Type</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="subjects-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Course Modal -->
+    <div class="modal-overlay" id="course-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Add Course</h3><button class="modal-close"
+                    onclick="utils.closeModal('course-modal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Name <span class="required">*</span></label><input
+                            type="text" id="c-name" class="form-control" required></div>
+                    <div class="form-group"><label class="form-label">Code</label><input type="text" id="c-code"
+                            class="form-control"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Department</label><select id="c-dept"
+                            class="form-control"></select></div>
+                    <div class="form-group"><label class="form-label">Degree Type</label><input type="text"
+                            id="c-degree" class="form-control" placeholder="B.E., B.Tech, M.E..."></div>
+                    <div class="form-group"><label class="form-label">Total Semesters</label><input type="number"
+                            id="c-sems" class="form-control" value="8"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="utils.closeModal('course-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveCourse()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subject Modal -->
+    <div class="modal-overlay" id="subject-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Add Subject</h3><button class="modal-close"
+                    onclick="utils.closeModal('subject-modal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Name <span class="required">*</span></label><input
+                            type="text" id="s-name" class="form-control" required></div>
+                    <div class="form-group"><label class="form-label">Code</label><input type="text" id="s-code"
+                            class="form-control"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Course</label><select id="s-course"
+                            class="form-control"></select></div>
+                    <div class="form-group"><label class="form-label">Semester</label><input type="number" id="s-sem"
+                            class="form-control" min="1" max="10" value="1"></div>
+                    <div class="form-group"><label class="form-label">Credits</label><input type="number" id="s-credits"
+                            class="form-control" value="3"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Type</label>
+                    <select id="s-type" class="form-control">
+                        <option value="theory">Theory</option>
+                        <option value="lab">Lab</option>
+                        <option value="project">Project</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="utils.closeModal('subject-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveSubject()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/sidebar.js"></script>
+    <script src="../assets/js/aira.js"></script>
+    <script>
+        auth.requireAuth();
+        if (!auth.hasRole('super_admin', 'admin')) {
+            window.location.href = '../dashboard.html';
+        }
+        renderSidebar('courses');
+        renderHeader('Courses & Subjects', 'Manage academic courses and subjects');
+
+        function switchTab(tab) {
+            ['courses', 'subjects'].forEach(t => document.getElementById(`tab-${t}`).style.display = t === tab ? '' : 'none');
+            document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', ['courses', 'subjects'][i] === tab));
+            if (tab === 'subjects') loadSubjects();
+        }
+
+        async function init() {
+            const [cRes, dRes] = await Promise.all([api.get('/courses'), api.get('/college/departments')]);
+            if (cRes?.ok) {
+                const courses = cRes.data.data || [];
+                utils.renderTable('courses-tbody', courses, c => `
+        <tr><td>${c.code || '—'}</td><td><strong>${c.name}</strong></td><td>${c.department_name || '—'}</td><td>${c.total_semesters}</td><td>${c.degree_type || '—'}</td>
+        <td><button class="btn btn-ghost btn-sm">✏️</button></td></tr>`);
+                utils.populateSelect('filter-course', courses, 'course_id', 'name', 'All Courses');
+                utils.populateSelect('s-course', courses, 'course_id', 'name', 'Select Course');
+            }
+            if (dRes?.ok) utils.populateSelect('c-dept', dRes.data.data || [], 'department_id', 'name', 'Select Department');
+        }
+
+        async function loadSubjects() {
+            const courseId = document.getElementById('filter-course').value;
+            const res = await api.get('/courses/subjects', courseId ? { course_id: courseId } : {});
+            if (res?.ok) {
+                utils.renderTable('subjects-tbody', res.data.data || [], s => `
+        <tr><td>${s.code || '—'}</td><td>${s.name}</td><td>${s.course_name}</td><td>${s.semester_number}</td><td>${s.credits}</td><td>${s.type}</td></tr>`);
+            }
+        }
+
+        async function saveCourse() {
+            const res = await api.post('/courses', {
+                name: document.getElementById('c-name').value,
+                code: document.getElementById('c-code').value,
+                department_id: document.getElementById('c-dept').value,
+                degree_type: document.getElementById('c-degree').value,
+                total_semesters: document.getElementById('c-sems').value
+            });
+            if (res?.ok) { utils.toast('Course added!', 'success'); utils.closeModal('course-modal'); init(); }
+            else utils.toast(res?.data?.message || 'Failed', 'error');
+        }
+
+        async function saveSubject() {
+            const res = await api.post('/courses/subjects', {
+                name: document.getElementById('s-name').value,
+                code: document.getElementById('s-code').value,
+                course_id: document.getElementById('s-course').value,
+                semester_number: document.getElementById('s-sem').value,
+                credits: document.getElementById('s-credits').value,
+                type: document.getElementById('s-type').value
+            });
+            if (res?.ok) { utils.toast('Subject added!', 'success'); utils.closeModal('subject-modal'); loadSubjects(); }
+            else utils.toast(res?.data?.message || 'Failed', 'error');
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

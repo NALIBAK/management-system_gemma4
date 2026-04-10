@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance — CMS</title>
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/aira.css">
+</head>
+
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">🎓</div>
+                <div class="logo-text">CMS <span>College Management</span></div>
+            </div>
+            <nav class="sidebar-nav"></nav>
+        </aside>
+        <div class="main-content">
+            <header class="header" id="page-header"></header>
+            <main class="page-content">
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('entry')">📋 Mark Attendance</button>
+                    <button class="tab-btn" onclick="switchTab('summary')">📊 Summary</button>
+                </div>
+
+                <!-- Entry Tab -->
+                <div id="tab-entry">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h3 class="card-title">Select Class</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Section</label>
+                                    <select class="form-control" id="att-section"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Subject</label>
+                                    <select class="form-control" id="att-subject"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Period</label>
+                                    <select class="form-control" id="att-period"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Date</label>
+                                    <input type="date" class="form-control" id="att-date">
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" onclick="loadStudentsForAttendance()">Load Students</button>
+                        </div>
+                    </div>
+
+                    <div class="card" id="att-entry-card" style="display:none">
+                        <div class="card-header">
+                            <h3 class="card-title">Mark Attendance</h3>
+                            <div class="flex gap-2">
+                                <button class="btn btn-success btn-sm" onclick="markAll('P')">✅ All Present</button>
+                                <button class="btn btn-danger btn-sm" onclick="markAll('A')">❌ All Absent</button>
+                            </div>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Roll No</th>
+                                        <th>Name</th>
+                                        <th>Present</th>
+                                        <th>Absent</th>
+                                        <th>OD</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="att-tbody"></tbody>
+                            </table>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-primary" onclick="saveAttendance()">💾 Save Attendance</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Tab -->
+                <div id="tab-summary" style="display:none">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Section</label>
+                                    <select class="form-control" id="sum-section"></select>
+                                </div>
+                                <div class="form-group" style="display:flex;align-items:flex-end">
+                                    <button class="btn btn-primary" onclick="loadSummary()">Load Summary</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">📊 Attendance Summary</h3>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Roll No</th>
+                                        <th>Name</th>
+                                        <th>Subject</th>
+                                        <th>Total</th>
+                                        <th>Present</th>
+                                        <th>%</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sum-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/sidebar.js"></script>
+    <script src="../assets/js/aira.js"></script>
+    <script>
+        auth.requireAuth();
+        renderSidebar('attendance');
+        renderHeader('Attendance', 'Mark and view attendance');
+
+        // Set today's date
+        document.getElementById('att-date').value = new Date().toISOString().split('T')[0];
+
+        let studentsData = [];
+        let currentAY = null;
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', (i === 0 && tab === 'entry') || (i === 1 && tab === 'summary')));
+            document.getElementById('tab-entry').style.display = tab === 'entry' ? '' : 'none';
+            document.getElementById('tab-summary').style.display = tab === 'summary' ? '' : 'none';
+        }
+
+        async function init() {
+            const [sectRes, perRes, ayRes] = await Promise.all([
+                api.get('/students/sections'),
+                api.get('/timetable/periods'),
+                api.get('/college/academic-years')
+            ]);
+            if (sectRes?.ok) {
+                const opts = sectRes.data.data || [];
+                utils.populateSelect('att-section', opts, 'section_id', s => `${s.course_name} - ${s.name}`, 'Select Section');
+                utils.populateSelect('sum-section', opts, 'section_id', s => `${s.course_name} - ${s.name}`, 'Select Section');
+            }
+            if (perRes?.ok) utils.populateSelect('att-period', perRes.data.data || [], 'period_id', p => `${p.label} (${p.start_time})`, 'Select Period');
+            if (ayRes?.ok) currentAY = (ayRes.data.data || []).find(a => a.is_current) || ayRes.data.data?.[0];
+        }
+
+        document.getElementById('att-section').onchange = async function () {
+            const res = await api.get('/students/', { section_id: this.value });
+            const subjects = await api.get('/staff/allocations', { section_id: this.value, academic_year_id: currentAY?.academic_year_id });
+            if (subjects?.ok) {
+                const subjectList = (subjects.data.data || []).map(a => ({ subject_id: a.subject_id, name: a.subject_name }));
+                utils.populateSelect('att-subject', subjectList, 'subject_id', 'name', 'Select Subject');
+            }
+        };
+
+        async function loadStudentsForAttendance() {
+            const sectionId = document.getElementById('att-section').value;
+            if (!sectionId) { utils.toast('Please select a section', 'warning'); return; }
+            const res = await api.get('/students/', { section_id: sectionId });
+            studentsData = res?.data?.data || [];
+            document.getElementById('att-entry-card').style.display = '';
+            utils.renderTable('att-tbody', studentsData, s => `
+      <tr>
+        <td>${s.roll_number}</td>
+        <td>${s.name}</td>
+        <td><input type="radio" name="att_${s.student_id}" value="P" checked></td>
+        <td><input type="radio" name="att_${s.student_id}" value="A"></td>
+        <td><input type="radio" name="att_${s.student_id}" value="OD"></td>
+      </tr>`);
+        }
+
+        function markAll(status) {
+            studentsData.forEach(s => {
+                const radio = document.querySelector(`input[name="att_${s.student_id}"][value="${status}"]`);
+                if (radio) radio.checked = true;
+            });
+        }
+
+        async function saveAttendance() {
+            const records = studentsData.map(s => ({
+                student_id: s.student_id,
+                status: document.querySelector(`input[name="att_${s.student_id}"]:checked`)?.value || 'A'
+            }));
+            const res = await api.post('/attendance/', {
+                section_id: document.getElementById('att-section').value,
+                subject_id: document.getElementById('att-subject').value,
+                period_id: document.getElementById('att-period').value,
+                academic_year_id: currentAY?.academic_year_id,
+                date: document.getElementById('att-date').value,
+                records
+            });
+            if (res?.ok) utils.toast('Attendance saved successfully!', 'success');
+            else utils.toast(res?.data?.message || 'Failed to save', 'error');
+        }
+
+        async function loadSummary() {
+            const sectionId = document.getElementById('sum-section').value;
+            if (!sectionId) { utils.toast('Select a section', 'warning'); return; }
+            const res = await api.get('/attendance/summary', { section_id: sectionId });
+            if (res?.ok) {
+                utils.renderTable('sum-tbody', res.data.data || [], r => {
+                    const color = utils.attendanceColor(r.percentage);
+                    return `<tr>
+          <td>${r.roll_number}</td>
+          <td>${r.student_name}</td>
+          <td>${r.subject_name}</td>
+          <td>${r.total_classes}</td>
+          <td>${r.present_count}</td>
+          <td><strong style="color:${color}">${r.percentage}%</strong></td>
+        </tr>`;
+                });
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

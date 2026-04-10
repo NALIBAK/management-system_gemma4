@@ -1,0 +1,624 @@
+/* ============================================================
+   AIRA Persistent Side Panel — College Management System
+   ============================================================ */
+
+/* ── AIRA Toggle Button (injected into nav .header-actions) ── */
+.btn-aira-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    background: linear-gradient(135deg, #4f7ef8, #7c4dff);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(79, 126, 248, 0.35);
+}
+
+.btn-aira-toggle:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(79, 126, 248, 0.5);
+}
+
+.btn-aira-toggle.panel-closed {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    box-shadow: none;
+}
+
+/* ── Resize Handle ── */
+.aira-resize-handle {
+    position: fixed;
+    top: 0;
+    width: 4px;
+    height: 100vh;
+    background: var(--border);
+    cursor: col-resize;
+    z-index: 95;
+    transition: background 0.2s;
+    user-select: none;
+}
+
+.aira-resize-handle:hover,
+.aira-resize-handle.dragging {
+    background: var(--accent);
+}
+
+/* ── Persistent Side Panel ── */
+.aira-side-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    background: var(--bg-secondary);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    z-index: 90;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.08);
+}
+
+.aira-side-panel.aira-panel-collapsed {
+    transform: translateX(100%);
+}
+
+/* ── Panel Header ── */
+.aira-panel-header {
+    background: linear-gradient(135deg, #4f7ef8 0%, #7c4dff 100%);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    gap: 10px;
+    min-height: 64px;
+}
+
+.aira-panel-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+}
+
+.aira-panel-avatar {
+    width: 38px;
+    height: 38px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.aira-panel-title {
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.3;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.aira-panel-badge {
+    font-size: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.95);
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.aira-panel-subtitle {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 11px;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.aira-panel-header-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.aira-collapse-btn {
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.aira-collapse-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* ── Quick Action Chips ── */
+.aira-quick-actions {
+    padding: 8px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    background: var(--bg-tertiary);
+}
+
+.aira-quick-chip {
+    padding: 4px 10px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    white-space: nowrap;
+    font-family: inherit;
+}
+
+.aira-quick-chip:hover {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-1px);
+}
+
+/* ── Messages Area ── */
+.aira-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scroll-behavior: smooth;
+}
+
+.aira-messages::-webkit-scrollbar {
+    width: 4px;
+}
+
+.aira-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.aira-messages::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+}
+
+/* ── Page Separator ── */
+.aira-page-sep {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin: 4px 0;
+    font-style: italic;
+}
+
+.aira-page-sep::before,
+.aira-page-sep::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+/* ── Chat Bubbles ── */
+.aira-msg {
+    display: flex;
+    gap: 8px;
+    max-width: 100%;
+    align-items: flex-start;
+}
+
+.aira-msg.user {
+    flex-direction: row-reverse;
+}
+
+.aira-msg-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.aira-msg.aira .aira-msg-avatar {
+    background: linear-gradient(135deg, #4f7ef8, #7c4dff);
+    font-size: 15px;
+}
+
+.aira-msg-content {
+    max-width: calc(100% - 40px);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.aira-msg.user .aira-msg-content {
+    align-items: flex-end;
+}
+
+.aira-bubble {
+    padding: 9px 13px;
+    border-radius: 14px;
+    font-size: 13px;
+    line-height: 1.6;
+    word-break: break-word;
+    overflow-x: auto;
+}
+
+.aira-msg.user .aira-bubble {
+    background: var(--accent);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+}
+
+.aira-msg.aira .aira-bubble {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+}
+
+/* ── Markdown inside AIRA bubbles ── */
+.aira-bubble p {
+    margin-bottom: 6px;
+}
+
+.aira-bubble p:last-child {
+    margin-bottom: 0;
+}
+
+.aira-bubble strong {
+    font-weight: 700;
+}
+
+.aira-bubble em {
+    font-style: italic;
+}
+
+.aira-bubble ul,
+.aira-bubble ol {
+    padding-left: 16px;
+    margin: 6px 0;
+}
+
+.aira-bubble li {
+    margin-bottom: 2px;
+}
+
+.aira-bubble h3,
+.aira-bubble h4 {
+    font-weight: 700;
+    margin: 8px 0 4px;
+}
+
+.aira-bubble code {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-family: monospace;
+    font-size: 12px;
+}
+
+.aira-bubble pre {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px;
+    overflow-x: auto;
+    margin: 8px 0;
+}
+
+.aira-bubble table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin: 8px 0;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.aira-bubble th {
+    background: linear-gradient(135deg, #4f7ef8, #7c4dff);
+    color: #fff;
+    padding: 7px 10px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.aira-bubble td {
+    padding: 6px 10px;
+    border-top: 1px solid var(--border);
+    color: var(--text-primary);
+}
+
+.aira-bubble tr:nth-child(even) td {
+    background: var(--bg-primary);
+}
+
+.aira-bubble tr:hover td {
+    background: var(--accent-light);
+}
+
+/* ── AIRA Interactive Cards ── */
+.aira-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-top: 6px;
+    max-width: 100%;
+}
+
+.aira-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+}
+
+.aira-card-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.aira-card-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.aira-card-btn {
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: inherit;
+}
+
+.aira-card-btn:hover {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.aira-card-btn.primary {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+}
+
+.aira-card-btn.primary:hover {
+    background: var(--accent-hover);
+}
+
+.aira-card-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ── Copy button ── */
+.aira-copy-btn {
+    font-size: 11px;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 6px;
+    align-self: flex-start;
+    transition: color 0.2s;
+    font-family: inherit;
+}
+
+.aira-copy-btn:hover {
+    color: var(--accent);
+}
+
+/* ── Typing indicator ── */
+.aira-typing {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 14px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    width: fit-content;
+}
+
+.aira-typing span {
+    width: 7px;
+    height: 7px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    animation: aira-bounce 1.2s infinite ease-in-out;
+}
+
+.aira-typing span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.aira-typing span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes aira-bounce {
+
+    0%,
+    60%,
+    100% {
+        transform: translateY(0);
+        opacity: 0.5;
+    }
+
+    30% {
+        transform: translateY(-6px);
+        opacity: 1;
+    }
+}
+
+/* ── Input Area ── */
+.aira-input-area {
+    padding: 10px 12px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-secondary);
+    flex-shrink: 0;
+}
+
+.aira-csv-banner {
+    background: var(--warning-light);
+    border: 1px solid var(--warning);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    color: var(--warning);
+    font-weight: 500;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.aira-input-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+}
+
+#aira-input {
+    flex: 1;
+    padding: 9px 14px;
+    background: var(--bg-tertiary);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    color: var(--text-primary);
+    font-size: 13px;
+    font-family: inherit;
+    resize: none;
+    outline: none;
+    min-height: 38px;
+    max-height: 120px;
+    line-height: 1.5;
+    transition: border-color 0.2s;
+    overflow-y: auto;
+}
+
+#aira-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(79, 126, 248, 0.12);
+}
+
+#aira-input::placeholder {
+    color: var(--text-muted);
+}
+
+#aira-send {
+    width: 37px;
+    height: 37px;
+    background: linear-gradient(135deg, #4f7ef8, #7c4dff);
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    transition: all 0.2s;
+}
+
+#aira-send:hover {
+    transform: scale(1.1);
+}
+
+#aira-send:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.aira-powered-by {
+    text-align: center;
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 6px;
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+    .aira-side-panel {
+        transform: translateX(100%) !important;
+        width: 100vw !important;
+    }
+
+    .aira-side-panel.mobile-visible {
+        transform: translateX(0) !important;
+    }
+
+    .aira-resize-handle {
+        display: none;
+    }
+
+    .btn-aira-toggle {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+}

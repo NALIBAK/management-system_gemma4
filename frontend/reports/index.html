@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports — CMS</title>
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/aira.css">
+</head>
+
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">🎓</div>
+                <div class="logo-text">CMS <span>College Management</span></div>
+            </div>
+            <nav class="sidebar-nav"></nav>
+        </aside>
+        <div class="main-content">
+            <header class="header" id="page-header"></header>
+            <main class="page-content">
+                <!-- Row 1: Original Reports -->
+                <div class="stat-grid mb-4">
+                    <div class="stat-card" style="cursor:pointer" onclick="loadReport('attendance-defaulters')">
+                        <div class="stat-icon orange">📉</div>
+                        <div class="stat-info">
+                            <div class="stat-value">Attendance</div>
+                            <div class="stat-label">Defaulters Report</div>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="cursor:pointer" onclick="loadReport('marks-summary')">
+                        <div class="stat-icon blue">📝</div>
+                        <div class="stat-info">
+                            <div class="stat-value">Marks</div>
+                            <div class="stat-label">Summary Report</div>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="cursor:pointer" onclick="loadReport('fee-defaulters')">
+                        <div class="stat-icon red">💸</div>
+                        <div class="stat-info">
+                            <div class="stat-value">Fee</div>
+                            <div class="stat-label">Defaulters Report</div>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="cursor:pointer" onclick="loadReport('department-summary')">
+                        <div class="stat-icon green">🏛️</div>
+                        <div class="stat-info">
+                            <div class="stat-value">Department</div>
+                            <div class="stat-label">Summary Report</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 2: New Reports -->
+                <div class="stat-grid mb-4">
+                    <div class="stat-card" style="cursor:pointer" onclick="loadReport('student-profile')">
+                        <div class="stat-icon blue">📊</div>
+                        <div class="stat-info">
+                            <div class="stat-value">Student Profile</div>
+                            <div class="stat-label">CGPA Report</div>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="cursor:pointer" onclick="loadReport('fee-structure')">
+                        <div class="stat-icon orange">💰</div>
+                        <div class="stat-info">
+                            <div class="stat-value">Fee Structure</div>
+                            <div class="stat-label">Breakdown Report</div>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="cursor:pointer" onclick="loadReport('eligibility')">
+                        <div class="stat-icon green">🎯</div>
+                        <div class="stat-info">
+                            <div class="stat-value">Eligibility</div>
+                            <div class="stat-label">Criteria Report</div>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="cursor:pointer" onclick="loadReport('category-wise')">
+                        <div class="stat-icon red">🏷️</div>
+                        <div class="stat-info">
+                            <div class="stat-value">Category Wise</div>
+                            <div class="stat-label">Student Report</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 3: More New Reports -->
+                <div class="stat-grid mb-4">
+                    <div class="stat-card" style="cursor:pointer" onclick="loadReport('scholarship')">
+                        <div class="stat-icon green">🎓</div>
+                        <div class="stat-info">
+                            <div class="stat-value">Scholarship</div>
+                            <div class="stat-label">Caste/Community Report</div>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="cursor:pointer" onclick="loadReport('extracurricular')">
+                        <div class="stat-icon blue">🏆</div>
+                        <div class="stat-info">
+                            <div class="stat-value">Extracurricular</div>
+                            <div class="stat-label">Activities Report</div>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="cursor:pointer" onclick="loadReport('attendance-detailed')">
+                        <div class="stat-icon orange">📅</div>
+                        <div class="stat-info">
+                            <div class="stat-value">Attendance</div>
+                            <div class="stat-label">Detailed Report</div>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="cursor:pointer" onclick="loadReport('marks-detailed')">
+                        <div class="stat-icon red">📝</div>
+                        <div class="stat-info">
+                            <div class="stat-value">Marks</div>
+                            <div class="stat-label">Detailed Report</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters Card -->
+                <div class="card mb-4" id="filter-card" style="display:none">
+                    <div class="card-header">
+                        <h3 class="card-title">🔍 Filters</h3>
+                        <button class="btn btn-primary btn-sm" onclick="applyFilters()">Apply Filters</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row" id="filter-row"></div>
+                    </div>
+                </div>
+
+                <!-- Report Table Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title" id="report-title">📊 Select a Report</h3>
+                        <div class="flex gap-2">
+                            <button class="btn btn-ghost btn-sm" id="export-btn" style="display:none"
+                                onclick="exportReport()">⬇️ Export CSV</button>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="table" id="report-table">
+                            <thead id="report-thead"></thead>
+                            <tbody id="report-tbody">
+                                <tr>
+                                    <td colspan="10" style="text-align:center;padding:60px;color:var(--text-muted)">
+                                        Click a report above to load data</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/sidebar.js"></script>
+    <script src="../assets/js/aira.js"></script>
+    <script>
+        auth.requireAuth();
+        if (!auth.hasRole('super_admin', 'admin', 'hod')) {
+            window.location.href = '../dashboard.html';
+        }
+        renderSidebar('reports');
+        renderHeader('Reports & Analytics', 'Generate insights from system data');
+
+        let currentReport = null;
+        let currentData = [];
+
+        // --- Filter Data Cache ---
+        let departments = [], sections = [], subjects = [], courses = [];
+
+        async function loadFilterData() {
+            const [deptRes, secRes, subRes, courseRes] = await Promise.all([
+                api.get('/college/departments'),
+                api.get('/students/sections'),
+                api.get('/courses/subjects'),
+                api.get('/courses')
+            ]);
+            departments = deptRes?.data?.data || [];
+            sections = secRes?.data?.data || [];
+            subjects = subRes?.data?.data || [];
+            courses = courseRes?.data?.data || [];
+        }
+        loadFilterData();
+
+        // --- Report Configurations ---
+        const reportConfig = {
+            'attendance-defaulters': {
+                title: '📉 Attendance Defaulters',
+                endpoint: '/reports/attendance',
+                headers: ['Roll No', 'Name', 'Subject', 'Total Classes', 'Present', 'Percentage'],
+                filters: ['section_id'],
+                row: r => `<tr>
+                    <td>${r.roll_number}</td><td>${r.student_name}</td><td>${r.subject_name}</td>
+                    <td>${r.total_classes}</td><td>${r.present_count}</td>
+                    <td><strong style="color:${utils.attendanceColor(r.percentage)}">${r.percentage}%</strong></td>
+                </tr>`
+            },
+            'marks-summary': {
+                title: '📝 Marks Summary',
+                endpoint: '/reports/marks',
+                headers: ['Roll No', 'Name', 'Semester', 'GPA', 'CGPA', 'Credits', 'Status'],
+                filters: ['section_id'],
+                row: r => `<tr>
+                    <td>${r.roll_number}</td><td>${r.student_name}</td><td>Sem ${r.semester_number}</td>
+                    <td>${r.gpa}</td><td><strong>${r.cgpa}</strong></td><td>${r.credits_earned}/${r.total_credits}</td>
+                    <td>${utils.statusBadge(r.result_status)}</td>
+                </tr>`
+            },
+            'fee-defaulters': {
+                title: '💸 Fee Defaulters',
+                endpoint: '/reports/fee-defaulters',
+                headers: ['Reg No', 'Name', 'Total Fee', 'Paid', 'Balance'],
+                filters: ['department_id'],
+                row: r => `<tr>
+                    <td>${r.reg_number}</td><td>${r.name}</td>
+                    <td>${utils.formatCurrency(r.total_due)}</td><td>${utils.formatCurrency(r.total_paid)}</td>
+                    <td><strong style="color:var(--danger)">${utils.formatCurrency(r.balance)}</strong></td>
+                </tr>`
+            },
+            'department-summary': {
+                title: '🏛️ Department Summary',
+                endpoint: '/reports/department-summary',
+                headers: ['Department', 'Students', 'Staff', 'Courses'],
+                filters: [],
+                row: r => `<tr>
+                    <td><strong>${r.department_name}</strong></td>
+                    <td>${r.total_students}</td><td>${r.total_staff}</td><td>${r.total_courses}</td>
+                </tr>`
+            },
+
+            // ===== NEW REPORTS =====
+            'student-profile': {
+                title: '📊 Student Profile / CGPA Report',
+                endpoint: '/reports/student-profile',
+                headers: ['Reg No', 'Roll No', 'Name', 'Course', 'Department', 'Section', 'Category', 'Caste/Community', 'CGPA', 'Semester'],
+                filters: ['department_id', 'section_id'],
+                row: r => `<tr>
+                    <td>${r.reg_number}</td><td>${r.roll_number}</td><td><strong>${r.name}</strong></td>
+                    <td>${r.course_name}</td><td>${r.department_name}</td><td>${r.section_name}</td>
+                    <td>${utils.statusBadge(r.student_category || 'regular')}</td>
+                    <td>${r.caste_community || '—'}</td>
+                    <td><strong>${r.cgpa}</strong></td><td>${r.latest_semester || '—'}</td>
+                </tr>`
+            },
+            'fee-structure': {
+                title: '💰 Fee Structure Report',
+                endpoint: '/reports/fee-structure',
+                headers: ['Course', 'Fee Category', 'Semester', 'Total Amount', 'Year', 'Components'],
+                filters: ['course_id'],
+                row: r => `<tr>
+                    <td>${r.course_name}</td><td>${r.fee_category}</td><td>Sem ${r.semester_number}</td>
+                    <td><strong>${utils.formatCurrency(r.total_amount)}</strong></td>
+                    <td>${r.year_label}</td><td>${r.components || '—'}</td>
+                </tr>`
+            },
+            'eligibility': {
+                title: '🎯 Eligibility Criteria Report',
+                endpoint: '/reports/eligibility',
+                headers: ['Name', 'Reg No', 'Roll No', 'Criteria', 'Type', 'Threshold', 'Status', 'Value', 'Remarks'],
+                filters: ['section_id'],
+                row: r => `<tr>
+                    <td><strong>${r.student_name}</strong></td><td>${r.reg_number}</td><td>${r.roll_number}</td>
+                    <td>${r.criteria_name}</td><td>${r.criteria_type}</td>
+                    <td>${r.comparison} ${r.threshold_value}</td>
+                    <td>${utils.statusBadge(r.eligibility_status === 'match' ? 'pass' : 'fail')}</td>
+                    <td>${r.evaluated_value || '—'}</td><td>${r.remarks || '—'}</td>
+                </tr>`
+            },
+            'category-wise': {
+                title: '🏷️ Category-wise Student Report',
+                endpoint: '/reports/category-wise',
+                headers: ['Category', 'Course', 'Department', 'Student Count', 'Student Names'],
+                filters: ['department_id'],
+                row: r => `<tr>
+                    <td>${utils.statusBadge(r.student_category || 'regular')}</td>
+                    <td>${r.course_name}</td><td>${r.department_name}</td>
+                    <td><strong>${r.student_count}</strong></td>
+                    <td style="max-width:300px;white-space:normal">${r.student_names || '—'}</td>
+                </tr>`
+            },
+            'scholarship': {
+                title: '🎓 Scholarship — Caste/Community Report',
+                endpoint: '/reports/scholarship',
+                headers: ['Caste/Community', 'Student', 'Reg No', 'Course', 'Department', 'Scholarship', 'Amount', 'Status'],
+                filters: ['department_id'],
+                row: r => `<tr>
+                    <td>${r.caste_community || '—'}</td><td><strong>${r.student_name}</strong></td>
+                    <td>${r.reg_number}</td><td>${r.course_name}</td><td>${r.department_name}</td>
+                    <td>${r.scholarship_name}</td><td>${utils.formatCurrency(r.amount)}</td>
+                    <td>${utils.statusBadge(r.scholarship_status)}</td>
+                </tr>`
+            },
+            'extracurricular': {
+                title: '🏆 Extracurricular Activities Report',
+                endpoint: '/reports/extracurricular',
+                headers: ['Student', 'Reg No', 'Title', 'Type', 'Category', 'Date', 'Achievement', 'Department'],
+                filters: ['department_id', 'activity_type'],
+                row: r => `<tr>
+                    <td><strong>${r.student_name}</strong></td><td>${r.reg_number}</td>
+                    <td>${r.title}</td>
+                    <td>${utils.statusBadge(r.activity_type)}</td>
+                    <td>${r.category || '—'}</td><td>${utils.formatDate(r.event_date)}</td>
+                    <td>${r.achievement || '—'}</td><td>${r.department_name}</td>
+                </tr>`
+            },
+            'attendance-detailed': {
+                title: '📅 Attendance — Detailed Report',
+                endpoint: '/reports/attendance-detailed',
+                headers: ['Reg No', 'Roll No', 'Name', 'Subject', 'Department', 'Section', 'Total', 'Present', 'Absent', 'OD', 'Percentage'],
+                filters: ['department_id', 'section_id', 'subject_id'],
+                row: r => `<tr>
+                    <td>${r.reg_number}</td><td>${r.roll_number}</td><td><strong>${r.student_name}</strong></td>
+                    <td>${r.subject_name}</td><td>${r.department_name}</td><td>${r.section_name}</td>
+                    <td>${r.total_classes}</td><td>${r.present_count}</td><td>${r.absent_count}</td><td>${r.od_count}</td>
+                    <td><strong style="color:${utils.attendanceColor(r.percentage)}">${r.percentage}%</strong></td>
+                </tr>`
+            },
+            'marks-detailed': {
+                title: '📝 Marks — Detailed Report',
+                endpoint: '/reports/marks-detailed',
+                headers: ['Reg No', 'Roll No', 'Name', 'Exam', 'Type', 'Subject', 'Department', 'Marks', 'Max', 'Status'],
+                filters: ['department_id', 'section_id', 'subject_id'],
+                row: r => `<tr>
+                    <td>${r.reg_number}</td><td>${r.roll_number}</td><td><strong>${r.student_name}</strong></td>
+                    <td>${r.exam_name}</td><td>${r.exam_type}</td><td>${r.subject_name}</td>
+                    <td>${r.department_name}</td>
+                    <td>${r.marks_obtained}</td><td>${r.max_marks}</td>
+                    <td>${utils.statusBadge(r.result_status)}</td>
+                </tr>`
+            }
+        };
+
+        function renderFilters(type) {
+            const config = reportConfig[type];
+            const filterRow = document.getElementById('filter-row');
+            const filterCard = document.getElementById('filter-card');
+
+            if (!config.filters || config.filters.length === 0) {
+                filterCard.style.display = 'none';
+                return;
+            }
+
+            filterCard.style.display = '';
+            let html = '';
+
+            if (config.filters.includes('department_id')) {
+                html += `<div class="form-group">
+                    <label>Department</label>
+                    <select id="filter-department" class="form-control">
+                        <option value="">All Departments</option>
+                        ${departments.map(d => `<option value="${d.department_id}">${d.name}</option>`).join('')}
+                    </select>
+                </div>`;
+            }
+            if (config.filters.includes('section_id')) {
+                html += `<div class="form-group">
+                    <label>Section</label>
+                    <select id="filter-section" class="form-control">
+                        <option value="">All Sections</option>
+                        ${sections.map(s => `<option value="${s.section_id}">${s.name} (${s.course_name})</option>`).join('')}
+                    </select>
+                </div>`;
+            }
+            if (config.filters.includes('subject_id')) {
+                html += `<div class="form-group">
+                    <label>Subject</label>
+                    <select id="filter-subject" class="form-control">
+                        <option value="">All Subjects</option>
+                        ${subjects.map(s => `<option value="${s.subject_id}">${s.name} (${s.code})</option>`).join('')}
+                    </select>
+                </div>`;
+            }
+            if (config.filters.includes('course_id')) {
+                html += `<div class="form-group">
+                    <label>Course</label>
+                    <select id="filter-course" class="form-control">
+                        <option value="">All Courses</option>
+                        ${courses.map(c => `<option value="${c.course_id}">${c.name}</option>`).join('')}
+                    </select>
+                </div>`;
+            }
+            if (config.filters.includes('activity_type')) {
+                html += `<div class="form-group">
+                    <label>Activity Type</label>
+                    <select id="filter-activity-type" class="form-control">
+                        <option value="">All Types</option>
+                        <option value="technical">Technical</option>
+                        <option value="non_technical">Non-Technical</option>
+                    </select>
+                </div>`;
+            }
+
+            filterRow.innerHTML = html;
+        }
+
+        function getFilterParams() {
+            const params = new URLSearchParams();
+            const deptEl = document.getElementById('filter-department');
+            const secEl = document.getElementById('filter-section');
+            const subEl = document.getElementById('filter-subject');
+            const courseEl = document.getElementById('filter-course');
+            const actEl = document.getElementById('filter-activity-type');
+
+            if (deptEl && deptEl.value) params.append('department_id', deptEl.value);
+            if (secEl && secEl.value) params.append('section_id', secEl.value);
+            if (subEl && subEl.value) params.append('subject_id', subEl.value);
+            if (courseEl && courseEl.value) params.append('course_id', courseEl.value);
+            if (actEl && actEl.value) params.append('activity_type', actEl.value);
+
+            // For fee-defaulters, add a default academic_year_id=1
+            if (currentReport === 'fee-defaulters') {
+                params.append('academic_year_id', '1');
+            }
+
+            return params.toString();
+        }
+
+        async function loadReport(type) {
+            currentReport = type;
+            const config = reportConfig[type];
+            document.getElementById('report-title').textContent = config.title;
+            document.getElementById('export-btn').style.display = '';
+            document.getElementById('report-thead').innerHTML = `<tr>${config.headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+            document.getElementById('report-tbody').innerHTML = `<tr><td colspan="${config.headers.length}" style="text-align:center;padding:30px">Loading...</td></tr>`;
+
+            renderFilters(type);
+
+            const filterStr = getFilterParams();
+            const url = config.endpoint + (filterStr ? '?' + filterStr : '');
+            const res = await api.get(url);
+            currentData = res?.data?.data || [];
+            utils.renderTable('report-tbody', currentData, config.row);
+        }
+
+        async function applyFilters() {
+            if (!currentReport) return;
+            const config = reportConfig[currentReport];
+            document.getElementById('report-tbody').innerHTML = `<tr><td colspan="${config.headers.length}" style="text-align:center;padding:30px">Loading...</td></tr>`;
+
+            const filterStr = getFilterParams();
+            const url = config.endpoint + (filterStr ? '?' + filterStr : '');
+            const res = await api.get(url);
+            currentData = res?.data?.data || [];
+            utils.renderTable('report-tbody', currentData, config.row);
+        }
+
+        function exportReport() {
+            if (!currentData.length) return;
+            const config = reportConfig[currentReport];
+            const rows = [config.headers.join(',')];
+            currentData.forEach(r => {
+                const el = document.createElement('div');
+                el.innerHTML = config.row(r);
+                const cells = [...el.querySelectorAll('td')].map(td => `"${td.textContent.trim()}"`);
+                rows.push(cells.join(','));
+            });
+            const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `${currentReport}-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            utils.toast('Report exported!', 'success');
+        }
+    </script>
+</body>
+
+</html>

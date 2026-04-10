@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Attendance Report — {{ college.name }}</title>
+    {{ style_tag | safe }}
+</head>
+
+<body>
+
+    <div id="running-header">
+        <span>{{ college.name }}</span>
+        <span>Attendance Report</span>
+        <span>{{ generated_at }}</span>
+    </div>
+    <div id="running-footer">
+        <span>Confidential — Academic Department</span>
+        <span class="page-num"></span>
+    </div>
+
+    <div class="report-cover">
+        <div class="college-name">{{ college.name }}</div>
+        <div class="college-sub">{{ college.address }} | {{ college.phone }}</div>
+        <hr class="divider" />
+        <div class="report-title">Attendance Summary Report</div>
+        <div class="report-subtitle">
+            {% if filter_label %}{{ filter_label }}{% else %}All Sections{% endif %}
+        </div>
+        <div class="report-meta">
+            {% if date_from or date_to %}
+            Period: <strong>{{ date_from or 'Start' }}</strong> to <strong>{{ date_to or 'Today' }}</strong>
+            &nbsp;|&nbsp;
+            {% endif %}
+            Generated: <strong>{{ generated_at }}</strong><br />
+            Prepared by AIRA — College Intelligence Assistant
+        </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <table class="stat-wrapper" cellpadding="0" cellspacing="0">
+        <tr>
+            <td class="stat-card-td">
+                <div class="stat-num">{{ total_students }}</div>
+                <div class="stat-lbl">Students</div>
+            </td>
+            <td class="stat-card-td">
+                <div class="stat-num">{{ "%.1f"|format(avg_attendance) }}%</div>
+                <div class="stat-lbl">Avg. Attendance</div>
+            </td>
+            <td class="stat-card-td">
+                <div class="stat-num">{{ below75_count }}</div>
+                <div class="stat-lbl">Below 75%</div>
+            </td>
+            <td class="stat-card-td">
+                <div class="stat-num">{{ above90_count }}</div>
+                <div class="stat-lbl">Above 90%</div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Attendance Table -->
+    <div class="section-title">📋 Student-wise Attendance</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Student Name</th>
+                <th>Reg. No.</th>
+                <th>Subject</th>
+                <th>Section</th>
+                <th style="text-align:center;">Total</th>
+                <th style="text-align:center;">Present</th>
+                <th style="text-align:center;">Absent</th>
+                <th style="text-align:center;">Attendance %</th>
+                <th style="text-align:center;">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td><strong>{{ row.student_name }}</strong></td>
+                <td>{{ row.reg_number }}</td>
+                <td>{{ row.subject_name }}</td>
+                <td>{{ row.section_name }}</td>
+                <td style="text-align:center;">{{ row.total_classes }}</td>
+                <td style="text-align:center;">{{ row.present }}</td>
+                <td style="text-align:center;">{{ (row.total_classes or 0) - (row.present or 0) }}</td>
+                <td style="text-align:center;"><strong>{{ "%.1f"|format(row.pct or 0) }}%</strong></td>
+                <td style="text-align:center;">
+                    {% if (row.pct or 0) >= 90 %}
+                    <span class="badge badge-pass">Excellent</span>
+                    {% elif (row.pct or 0) >= 75 %}
+                    <span class="badge badge-info">Good</span>
+                    {% elif (row.pct or 0) >= 60 %}
+                    <span class="badge badge-warn">Low</span>
+                    {% else %}
+                    <span class="badge badge-fail">Critical</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Defaulters highlight -->
+    {% set defaulters = data | selectattr('pct', 'lt', 75) | list %}
+    {% if defaulters %}
+    <div class="section-title">⚠️ Students Below 75% Attendance (Action Required)</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Reg. No.</th>
+                <th>Subject</th>
+                <th style="text-align:center;">Attendance %</th>
+                <th style="text-align:center;">Classes Needed to Reach 75%</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in defaulters %}
+            {% set needed = ((0.75 * row.total_classes - row.present) / 0.25) | int + 1 if row.pct < 75 else 0 %} <tr>
+                <td><strong>{{ row.student_name }}</strong></td>
+                <td>{{ row.reg_number }}</td>
+                <td>{{ row.subject_name }}</td>
+                <td style="text-align:center;"><span class="badge badge-fail">{{ "%.1f"|format(row.pct or 0) }}%</span>
+                </td>
+                <td style="text-align:center;">{{ [needed, 0] | max }} consecutive classes</td>
+                </tr>
+                {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <table class="sig-table">
+        <tr>
+            <td>
+                <div class="sig-line"></div>Class Advisor
+            </td>
+            <td>
+                <div class="sig-line"></div>Head of Department
+            </td>
+            <td>
+                <div class="sig-line"></div>Principal
+            </td>
+        </tr>
+    </table>
+
+</body>
+
+</html>

@@ -1,0 +1,220 @@
+/* ================================================================
+   report_styles.css - Legacy Print Stylesheet for xhtml2pdf
+   xhtml2pdf only supports basic CSS2.1
+   ================================================================ */
+
+/* Page Setup */
+@page {
+    size: a4 portrait;
+    margin: 1.5cm;
+
+    @frame header_frame {
+        -pdf-frame-content: header_content;
+        left: 50pt;
+        width: 512pt;
+        top: 30pt;
+        height: 30pt;
+    }
+
+    @frame footer_frame {
+        -pdf-frame-content: footer_content;
+        left: 50pt;
+        width: 512pt;
+        top: 780pt;
+        height: 30pt;
+    }
+}
+
+/* Base */
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 10pt;
+    line-height: 1.5;
+    color: #1a1a1a;
+}
+
+/* Running Header/Footer */
+#header_content {
+    border-bottom: 0.5pt solid #d0d0d0;
+    padding-bottom: 3pt;
+    font-size: 8pt;
+    color: #555555;
+    text-align: right;
+}
+
+#footer_content {
+    border-top: 0.5pt solid #d0d0d0;
+    padding-top: 3pt;
+    font-size: 8pt;
+    color: #555555;
+    text-align: center;
+}
+
+/* Cover Header (first page) */
+.report-cover {
+    text-align: center;
+    padding-bottom: 18pt;
+    margin-bottom: 18pt;
+    border-bottom: 1pt solid #1a3a5c;
+}
+
+.college-name {
+    font-size: 18pt;
+    font-weight: bold;
+    color: #1a3a5c;
+}
+
+.college-sub {
+    font-size: 9pt;
+    color: #555555;
+    margin-top: 2pt;
+    margin-bottom: 15pt;
+}
+
+.report-title {
+    font-size: 14pt;
+    font-weight: bold;
+    color: #1a3a5c;
+    margin-top: 10pt;
+}
+
+.report-subtitle {
+    font-size: 10pt;
+    color: #555555;
+    font-style: italic;
+    margin-top: 4pt;
+}
+
+.report-meta {
+    margin-top: 10pt;
+    font-size: 9pt;
+    color: #555555;
+}
+
+/* Section Headings */
+.section-title {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #1a3a5c;
+    margin: 15pt 0 8pt 0;
+    text-decoration: underline;
+}
+
+/* Info Block (simulated grid using tables) */
+.info-table {
+    width: 100%;
+    margin-bottom: 10pt;
+    background-color: #eef4fb;
+    border: 0.5pt solid #d0d0d0;
+}
+
+.info-table td {
+    padding: 6pt 10pt;
+    font-size: 9.5pt;
+}
+
+.info-table td.label {
+    color: #555555;
+    font-weight: bold;
+    width: 20%;
+}
+
+.info-table td.value {
+    color: #1a1a1a;
+    width: 30%;
+}
+
+/* Tables */
+table.data-table {
+    width: 100%;
+    margin-bottom: 14pt;
+    font-size: 9pt;
+    border: 0.5pt solid #d0d0d0;
+}
+
+table.data-table thead tr {
+    background-color: #1a3a5c;
+    color: #ffffff;
+}
+
+table.data-table th {
+    padding: 6pt;
+    text-align: left;
+    font-weight: bold;
+    font-size: 8.5pt;
+}
+
+table.data-table td {
+    padding: 5pt;
+    border-bottom: 0.5pt solid #d0d0d0;
+    vertical-align: top;
+}
+
+table.data-table tfoot td {
+    padding: 6pt;
+    background-color: #f0f0f0;
+    font-weight: bold;
+    border-top: 1pt solid #1a3a5c;
+}
+
+/* Stat Cards (simulated with table) */
+.stat-wrapper {
+    width: 100%;
+    margin-bottom: 14pt;
+}
+
+.stat-card-td {
+    text-align: center;
+    border: 0.5pt solid #d0d0d0;
+    padding: 10pt;
+    width: 25%;
+}
+
+.stat-num {
+    font-size: 16pt;
+    font-weight: bold;
+    color: #1a3a5c;
+}
+
+.stat-lbl {
+    font-size: 8pt;
+    color: #555555;
+    margin-top: 4pt;
+}
+
+/* Badges */
+.badge {
+    font-size: 8pt;
+    font-weight: bold;
+}
+
+.badge-pass {
+    color: #1e6b3c;
+}
+
+.badge-fail {
+    color: #9b1c1c;
+}
+
+.badge-warn {
+    color: #7a5500;
+}
+
+.badge-info {
+    color: #0c5460;
+}
+
+/* Signature Block */
+.sig-table {
+    width: 100%;
+    margin-top: 40pt;
+    text-align: center;
+    font-size: 9pt;
+    color: #555555;
+}
+
+.sig-line {
+    border-top: 0.5pt solid #1a1a1a;
+    width: 120pt;
+    margin: 0 auto;
+}

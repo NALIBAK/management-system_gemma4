@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings — CMS</title>
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/aira.css">
+</head>
+
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">🎓</div>
+                <div class="logo-text">CMS <span>College Management</span></div>
+            </div>
+            <nav class="sidebar-nav"></nav>
+        </aside>
+        <div class="main-content">
+            <header class="header" id="page-header"></header>
+            <main class="page-content">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('llm')">🤖 AIRA / LLM Config</button>
+                    <button class="tab-btn" onclick="switchTab('college')">🏛️ College Info</button>
+                    <button class="tab-btn" onclick="switchTab('whatsapp')">📱 WhatsApp Settings</button>
+                    <button class="tab-btn" onclick="switchTab('password')">🔒 Change Password</button>
+                </div>
+
+                <!-- LLM Config Tab -->
+                <div id="tab-llm">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">🤖 AIRA LLM Configuration</h3>
+                        </div>
+                        <div class="card-body">
+                            <form id="llm-form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Provider</label>
+                                        <select name="provider" class="form-control" id="llm-provider">
+                                            <option value="ollama">Ollama (Local)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Model</label>
+                                        <input type="text" name="selected_model" class="form-control" id="llm-model"
+                                            placeholder="e.g. gemma3:1b, gemini-1.5-flash">
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Temperature</label>
+                                        <input type="number" name="temperature" class="form-control" id="llm-temp"
+                                            min="0" max="2" step="0.1" value="0.7">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Max Tokens</label>
+                                        <input type="number" name="max_tokens" class="form-control" id="llm-tokens"
+                                            value="2048">
+                                    </div>
+                                </div>
+                                <div class="alert alert-info">
+                                    ℹ️ Offline Mode active. Ensure Ollama is running locally at
+                                    <code>http://localhost:11434</code>.
+                                </div>
+                                <button type="button" class="btn btn-primary" onclick="saveLLMConfig()">💾 Save LLM
+                                    Config</button>
+                                <button type="button" class="btn btn-ghost" onclick="testLLM()">🧪 Test
+                                    Connection</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- College Info Tab -->
+                <div id="tab-college" style="display:none">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">🏛️ College Information</h3>
+                        </div>
+                        <div class="card-body">
+                            <form id="college-form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">College Name</label>
+                                        <input type="text" name="name" class="form-control" id="college-name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">College Code</label>
+                                        <input type="text" name="code" class="form-control" id="college-code">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Phone</label>
+                                        <input type="text" name="phone" class="form-control" id="college-phone">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" name="email" class="form-control" id="college-email">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Address</label>
+                                    <textarea name="address" class="form-control" id="college-address"
+                                        rows="3"></textarea>
+                                </div>
+                                <button type="button" class="btn btn-primary" onclick="saveCollege()">💾 Save College
+                                    Info</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Change Password Tab -->
+                <div id="tab-password" style="display:none">
+                    <div class="card" style="max-width:480px">
+                        <div class="card-header">
+                            <h3 class="card-title">🔒 Change Password</h3>
+                        </div>
+                        <div class="card-body">
+                            <form id="password-form">
+                                <div class="form-group">
+                                    <label class="form-label">Current Password</label>
+                                    <input type="password" name="old_password" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">New Password</label>
+                                    <input type="password" name="new_password" class="form-control" required
+                                        minlength="8">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Confirm New Password</label>
+                                    <input type="password" id="confirm-password" class="form-control" required>
+                                </div>
+                                <button type="button" class="btn btn-primary" onclick="changePassword()">🔒 Change
+                                    Password</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WhatsApp Integration Tab -->
+                <div id="tab-whatsapp" style="display:none">
+                    <div class="card" style="max-width:550px">
+                        <div class="card-header">
+                            <h3 class="card-title">📱 WhatsApp Integration</h3>
+                        </div>
+                        <div class="card-body" style="text-align: center;">
+                            <p style="margin-bottom: 20px; color: #555;">Connect your WhatsApp account to enable AIRA to
+                                send native notifications to parents and staff automatically.</p>
+
+                            <div id="wa-status-container"
+                                style="margin: 20px 0; padding: 15px; border-radius: 8px; background: #eef4fb; border: 1px solid #d1dfed;">
+                                <h4 style="margin: 0; font-size: 1.1rem;">Service Status: <span id="wa-status-text"
+                                        style="font-weight: bold; color: #0056b3;">Checking...</span></h4>
+                            </div>
+
+                            <div id="wa-qr-container"
+                                style="display: none; margin: 20px 0; padding: 20px; background: white; border-radius: 8px; border: 1px dashed #ccc;">
+                                <p class="text-muted" style="margin-bottom: 15px;">Scan this static QR code with the
+                                    WhatsApp app (Linked Devices).</p>
+                                <img id="wa-qr-image" src="" alt="WhatsApp Login QR Code"
+                                    style="max-width: 250px; display: block; margin: 0 auto;">
+                                <div style="margin-top: 20px;">
+                                    <button class="btn btn-outline" onclick="loadWhatsAppStatus()">↻ Refresh QR &
+                                        Status</button>
+                                </div>
+                            </div>
+
+                            <div id="wa-actions" style="display: none; margin-top: 20px; text-align: left;">
+                                <div class="form-group">
+                                    <label class="form-label">Test Connection</label>
+                                    <div style="display: flex; gap: 10px;">
+                                        <input type="text" id="wa-test-number" class="form-control"
+                                            placeholder="Your Phone number (e.g. 9876543210)">
+                                        <button class="btn btn-primary" onclick="testWhatsApp()">Send Test</button>
+                                    </div>
+                                    <div class="form-hint">Enter your number to receive a secure sandbox test limit
+                                        message.</div>
+                                </div>
+                                <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;">
+                                <button class="btn"
+                                    style="background: white; color: #dc3545; border: 1px solid #dc3545; width: 100%;"
+                                    onclick="logoutWhatsApp()">Disconnect WhatsApp</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/sidebar.js"></script>
+    <script src="../assets/js/aira.js"></script>
+    <script>
+        auth.requireAuth();
+        if (!auth.hasRole('super_admin', 'admin')) {
+            window.location.href = '../dashboard.html';
+        }
+        renderSidebar('settings');
+        renderHeader('System Settings', 'Configure global application parameters');
+
+        function switchTab(tab) {
+            ['llm', 'college', 'whatsapp', 'password'].forEach(t => {
+                document.getElementById(`tab-${t}`).style.display = t === tab ? '' : 'none';
+            });
+            document.querySelectorAll('.tab-btn').forEach((b, i) => {
+                b.classList.toggle('active', ['llm', 'college', 'whatsapp', 'password'][i] === tab);
+            });
+
+            if (tab === 'whatsapp') loadWhatsAppStatus();
+        }
+
+        function toggleApiKey() {
+            // Function preserved for backwards compatibility with inline scripts, purposefully empty
+        }
+
+        async function init() {
+            const [llmRes, colRes] = await Promise.all([api.get('/aira/config'), api.get('/college/')]);
+            if (llmRes?.ok && llmRes.data.data) {
+                const c = llmRes.data.data;
+                document.getElementById('llm-provider').value = c.provider || 'ollama';
+                document.getElementById('llm-model').value = c.selected_model || '';
+                document.getElementById('llm-temp').value = c.temperature || 0.7;
+                document.getElementById('llm-tokens').value = c.max_tokens || 2048;
+            }
+            if (colRes?.ok && colRes.data.data?.length) {
+                const col = colRes.data.data[0];
+                document.getElementById('college-name').value = col.name || '';
+                document.getElementById('college-code').value = col.code || '';
+                document.getElementById('college-phone').value = col.phone || '';
+                document.getElementById('college-email').value = col.email || '';
+                document.getElementById('college-address').value = col.address || '';
+            }
+        }
+
+        async function saveLLMConfig() {
+            const data = utils.getFormData('llm-form');
+            const res = await api.post('/aira/config', data);
+            if (res?.ok) utils.toast('LLM config saved!', 'success');
+            else utils.toast(res?.data?.message || 'Failed', 'error');
+        }
+
+        async function testLLM() {
+            utils.toast('Testing connection...', 'info');
+            const res = await api.get('/aira/test');
+            if (res?.ok) utils.toast('✅ Connection successful!', 'success');
+            else utils.toast('❌ Connection failed. Check your config.', 'error');
+        }
+
+        async function saveCollege() {
+            const data = utils.getFormData('college-form');
+            const res = await api.put('/college/1', data);
+            if (res?.ok) utils.toast('College info saved!', 'success');
+            else utils.toast(res?.data?.message || 'Failed', 'error');
+        }
+
+        async function changePassword() {
+            const data = utils.getFormData('password-form');
+            const confirm = document.getElementById('confirm-password').value;
+            if (data.new_password !== confirm) { utils.toast('Passwords do not match', 'error'); return; }
+            const res = await api.post('/auth/change-password', data);
+            if (res?.ok) { utils.toast('Password changed!', 'success'); document.getElementById('password-form').reset(); }
+            else utils.toast(res?.data?.message || 'Failed', 'error');
+        }
+
+        async function loadWhatsAppStatus() {
+            const statusEl = document.getElementById('wa-status-text');
+            statusEl.textContent = 'Checking...';
+            statusEl.style.color = '#0056b3';
+
+            const res = await api.get('/whatsapp/status');
+            if (res?.ok) {
+                if (res.data.status === 'CONNECTED') {
+                    statusEl.textContent = 'CONNECTED ✅';
+                    statusEl.style.color = '#28a745';
+                    document.getElementById('wa-qr-container').style.display = 'none';
+                    document.getElementById('wa-actions').style.display = 'block';
+                } else {
+                    statusEl.textContent = 'DISCONNECTED ❌';
+                    statusEl.style.color = '#dc3545';
+                    document.getElementById('wa-actions').style.display = 'none';
+                    fetchWhatsAppQR();
+                }
+            } else {
+                statusEl.textContent = 'SERVICE OFFLINE ⚠️';
+                statusEl.style.color = '#dc3545';
+                document.getElementById('wa-qr-container').style.display = 'none';
+                document.getElementById('wa-actions').style.display = 'none';
+                utils.toast('WhatsApp microservice is not running. Please restart the backend.', 'error');
+            }
+        }
+
+        async function fetchWhatsAppQR() {
+            const res = await api.get('/whatsapp/qr');
+            if (res?.ok && res.data.qr) {
+                document.getElementById('wa-qr-image').src = res.data.qr;
+                document.getElementById('wa-qr-container').style.display = 'block';
+            } else if (res?.ok && res.data.status === 'CONNECTED') {
+                loadWhatsAppStatus(); // They probably scanned it just now
+            } else {
+                document.getElementById('wa-qr-container').style.display = 'none';
+            }
+        }
+
+        async function testWhatsApp() {
+            const number = document.getElementById('wa-test-number').value.trim();
+            if (!number) return utils.toast('Please enter a phone number', 'error');
+
+            utils.toast('Simulating typing and sending...', 'info');
+            const res = await api.post('/whatsapp/send', {
+                number: number,
+                message: "Hello! This is a test message from AIRA. The College Management System is successfully linked to WhatsApp Web. ✅"
+            });
+            if (res?.ok) {
+                utils.toast('Test message sent successfully!', 'success');
+                document.getElementById('wa-test-number').value = '';
+            } else {
+                utils.toast(res?.data?.error || 'Failed to send message', 'error');
+            }
+        }
+
+        async function logoutWhatsApp() {
+            if (!confirm('Are you sure you want to disconnect WhatsApp? You will need to scan the QR code again.')) return;
+            const res = await api.post('/whatsapp/logout');
+            if (res?.ok) {
+                utils.toast('Logged out successfully', 'success');
+                setTimeout(loadWhatsAppStatus, 1500); // Give node microservice time to cleanly log out
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

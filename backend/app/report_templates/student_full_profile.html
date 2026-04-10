@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>{{ report_title }} — {{ college.name }}</title>
+    {{ style_tag | safe }}
+</head>
+
+<body>
+
+    <!-- Running header (appears page 2+) -->
+    <div id="running-header">
+        <span>{{ college.name }}</span>
+        <span>{{ report_title }}</span>
+        <span>Generated: {{ generated_at }}</span>
+    </div>
+
+    <!-- Running footer -->
+    <div id="running-footer">
+        <span>Confidential — For Internal Use Only</span>
+        <span class="page-num"></span>
+    </div>
+
+    <!-- ── Page 1: Cover header ── -->
+    <div class="report-cover">
+        <div class="college-name">{{ college.name }}</div>
+        <div class="college-sub">{{ college.address }} | {{ college.phone }} | {{ college.email }}</div>
+        <hr class="divider" />
+        <div class="report-title">Student Full Profile Report</div>
+        <div class="report-subtitle">Comprehensive Academic & Co-Curricular Profile</div>
+        <div class="report-meta">
+            Generated on <strong>{{ generated_at }}</strong> &nbsp;|&nbsp;
+            Prepared by AIRA — College Intelligence Assistant
+        </div>
+    </div>
+
+    <!-- ── Student Info Section ── -->
+    <div class="section-title">👤 Personal & Academic Details</div>
+    <div class="info-grid">
+        <span class="label">Full Name</span> <span class="value">{{ student.name }}</span>
+        <span class="label">Reg. Number</span> <span class="value">{{ student.reg_number }}</span>
+        <span class="label">Roll Number</span> <span class="value">{{ student.roll_number or '—' }}</span>
+        <span class="label">Gender</span> <span class="value">{{ student.gender or '—' }}</span>
+        <span class="label">Email</span> <span class="value">{{ student.email or '—' }}</span>
+        <span class="label">Phone</span> <span class="value">{{ student.phone or '—' }}</span>
+        <span class="label">Course</span> <span class="value">{{ student.course_name }}</span>
+        <span class="label">Department</span> <span class="value">{{ student.department_name }}</span>
+        <span class="label">Section</span> <span class="value">{{ student.section_name }}</span>
+        <span class="label">Category</span> <span class="value">{{ student.student_category or '—' }}</span>
+        <span class="label">Community</span> <span class="value">{{ student.caste_community or '—' }}</span>
+        <span class="label">Status</span> <span class="value">{{ student.status | title }}</span>
+    </div>
+
+    <!-- ── Summary Stats ── -->
+    {% if cgpa_semesters %}
+    <div class="stat-row no-break">
+        <div class="stat-card">
+            <div class="num">{{ "%.2f" | format(latest_cgpa) }}</div>
+            <div class="lbl">Current CGPA</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">{{ cgpa_semesters | length }}</div>
+            <div class="lbl">Semesters Completed</div>
+        </div>
+        {% if attendance_pct is not none %}
+        <div class="stat-card">
+            <div class="num">{{ "%.1f" | format(attendance_pct) }}%</div>
+            <div class="lbl">Overall Attendance</div>
+        </div>
+        {% endif %}
+        {% if total_activities is not none %}
+        <div class="stat-card">
+            <div class="num">{{ total_activities }}</div>
+            <div class="lbl">Activities</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ── CGPA Progression ── -->
+    <div class="section-title">📈 Semester-wise CGPA Progression</div>
+    <table class="no-break">
+        <thead>
+            <tr>
+                <th>Semester</th>
+                <th>GPA</th>
+                <th>CGPA</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sem in cgpa_semesters %}
+            <tr>
+                <td>Semester {{ sem.semester_number }}</td>
+                <td>{{ "%.2f" | format(sem.gpa or 0) }}</td>
+                <td>{{ "%.2f" | format(sem.cgpa or 0) }}</td>
+                <td>
+                    {% if (sem.cgpa or 0) >= 6.0 %}
+                    <span class="badge badge-pass">Pass</span>
+                    {% else %}
+                    <span class="badge badge-fail">At Risk</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <!-- ── Attendance Subject-wise ── -->
+    {% if attendance_data %}
+    <div class="section-title">📋 Subject-wise Attendance</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Subject</th>
+                <th style="text-align:center;">Total Classes</th>
+                <th style="text-align:center;">Present</th>
+                <th style="text-align:center;">Attendance %</th>
+                <th style="text-align:center;">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in attendance_data %}
+            <tr>
+                <td>{{ row.subject }}</td>
+                <td style="text-align:center;">{{ row.total }}</td>
+                <td style="text-align:center;">{{ row.present }}</td>
+                <td style="text-align:center;">{{ "%.1f" | format(row.pct or 0) }}%</td>
+                <td style="text-align:center;">
+                    {% if (row.pct or 0) >= 75 %}
+                    <span class="badge badge-pass">OK</span>
+                    {% else %}
+                    <span class="badge badge-fail">Low</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <!-- ── Extracurricular Activities ── -->
+    {% if activities %}
+    <div class="section-title">🏆 Extracurricular Activities</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Date</th>
+                <th>Achievement</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for act in activities %}
+            <tr>
+                <td>{{ act.title }}</td>
+                <td>{{ (act.activity_type or '') | replace('_', ' ') | title }}</td>
+                <td>{{ act.category or '—' }}</td>
+                <td>{{ act.event_date or '—' }}</td>
+                <td>{{ act.achievement or '—' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <!-- ── Fee Status ── -->
+    {% if fee_data %}
+    <div class="section-title">💰 Fee Status (Current Academic Year)</div>
+    <div class="info-grid no-break">
+        <span class="label">Total Due</span> <span class="value">₹ {{ "{:,.0f}".format(fee_data.total_due or 0)
+            }}</span>
+        <span class="label">Total Paid</span> <span class="value">₹ {{ "{:,.0f}".format(fee_data.total_paid or 0)
+            }}</span>
+        <span class="label">Balance</span>
+        <span class="value">
+            {% if (fee_data.balance or 0) > 0 %}
+            <span class="badge badge-fail">₹ {{ "{:,.0f}".format(fee_data.balance) }} Pending</span>
+            {% else %}
+            <span class="badge badge-pass">Fully Paid</span>
+            {% endif %}
+        </span>
+    </div>
+    {% endif %}
+
+    <!-- ── Signature Block ── -->
+    <div class="signature-block no-break">
+        <div class="sig">
+            <div class="sig-line"></div>
+            Class Advisor
+        </div>
+        <div class="sig">
+            <div class="sig-line"></div>
+            Head of Department
+        </div>
+        <div class="sig">
+            <div class="sig-line"></div>
+            Principal
+        </div>
+    </div>
+
+</body>
+
+</html>

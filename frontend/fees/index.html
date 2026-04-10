@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fees — CMS</title>
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/aira.css">
+</head>
+
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">🎓</div>
+                <div class="logo-text">CMS <span>College Management</span></div>
+            </div>
+            <nav class="sidebar-nav"></nav>
+        </aside>
+        <div class="main-content">
+            <header class="header" id="page-header"></header>
+            <main class="page-content">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('payments')">💳 Payments</button>
+                    <button class="tab-btn" onclick="switchTab('balance')">💰 Student Balance</button>
+                    <button class="tab-btn" onclick="switchTab('structures')">📋 Fee Structures</button>
+                    <button class="tab-btn" onclick="switchTab('scholarships')">🎓 Scholarships</button>
+                </div>
+
+                <!-- Payments Tab -->
+                <div id="tab-payments">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h3 class="card-title">Recent Payments</h3>
+                            <button class="btn btn-primary btn-sm" onclick="utils.openModal('add-payment-modal')">➕
+                                Record Payment</button>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Receipt No</th>
+                                        <th>Student</th>
+                                        <th>Amount</th>
+                                        <th>Mode</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="payments-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Balance Tab -->
+                <div id="tab-balance" style="display:none">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="flex gap-3 items-center">
+                                <div class="search-bar">
+                                    <span class="search-icon">🔍</span>
+                                    <input type="text" class="form-control" id="balance-search"
+                                        placeholder="Search student by name or reg no...">
+                                </div>
+                                <button class="btn btn-primary" onclick="searchBalance()">Search</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card" id="balance-result" style="display:none">
+                        <div class="card-header">
+                            <h3 class="card-title">💰 Fee Balance</h3>
+                        </div>
+                        <div class="card-body" id="balance-content"></div>
+                    </div>
+                </div>
+
+                <!-- Fee Structures Tab -->
+                <div id="tab-structures" style="display:none">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">📋 Fee Structures</h3>
+                            <button class="btn btn-primary btn-sm" onclick="openAddStructure()">➕ Add Structure</button>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Course</th>
+                                        <th>Sem</th>
+                                        <th>Category</th>
+                                        <th>Academic Year</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="structures-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scholarships Tab -->
+                <div id="tab-scholarships" style="display:none">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">🎓 Scholarships</h3>
+                            <button class="btn btn-primary btn-sm" onclick="utils.openModal('add-scholarship-modal')">➕
+                                Add Scholarship</button>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Scholarship</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="scholarships-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Add Payment Modal -->
+    <div class="modal-overlay" id="add-payment-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Record Payment</h3>
+                <button class="modal-close" onclick="utils.closeModal('add-payment-modal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="payment-form">
+                    <div class="form-group">
+                        <label class="form-label">Student <span class="required">*</span></label>
+                        <input type="text" id="payment-student-search" class="form-control"
+                            placeholder="Search student...">
+                        <input type="hidden" id="payment-student-id">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fee Structure <span class="required">*</span></label>
+                        <select class="form-control" id="payment-fee-structure"></select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Amount Paid <span class="required">*</span></label>
+                            <input type="number" name="amount_paid" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Payment Mode</label>
+                            <select name="payment_mode" class="form-control">
+                                <option value="cash">Cash</option>
+                                <option value="online">Online</option>
+                                <option value="upi">UPI</option>
+                                <option value="cheque">Cheque</option>
+                                <option value="dd">DD</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Receipt Number</label>
+                        <input type="text" name="receipt_number" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="utils.closeModal('add-payment-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="savePayment()">Record Payment</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Fee Structure Modal -->
+    <div class="modal-overlay" id="add-structure-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Add Fee Structure</h3>
+                <button class="modal-close" onclick="utils.closeModal('add-structure-modal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Course <span class="required">*</span></label>
+                        <select id="fs-course" class="form-control"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Academic Year <span class="required">*</span></label>
+                        <select id="fs-academic-year" class="form-control"></select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Fee Category <span class="required">*</span></label>
+                        <select id="fs-category" class="form-control"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Semester <span class="required">*</span></label>
+                        <input type="number" id="fs-semester" class="form-control" value="1" min="1" max="10">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Total Amount <span class="required">*</span></label>
+                    <input type="number" id="fs-amount" class="form-control" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="utils.closeModal('add-structure-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveStructure()">Save Structure</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/sidebar.js"></script>
+    <script src="../assets/js/aira.js"></script>
+    <script>
+        auth.requireAuth();
+        if (!auth.hasRole('super_admin', 'admin')) {
+            window.location.href = '../dashboard.html';
+        }
+        renderSidebar('fees');
+        renderHeader('Fee Management', 'Manage fee structures and payments');
+
+        function switchTab(tab) {
+            ['payments', 'balance', 'structures', 'scholarships'].forEach(t => {
+                document.getElementById(`tab-${t}`).style.display = t === tab ? '' : 'none';
+            });
+            document.querySelectorAll('.tab-btn').forEach((b, i) => {
+                b.classList.toggle('active', ['payments', 'balance', 'structures', 'scholarships'][i] === tab);
+            });
+            if (tab === 'scholarships') loadScholarships();
+            if (tab === 'structures') loadStructures();
+        }
+
+        async function init() {
+            const res = await api.get('/fees/payments');
+            if (res?.ok) {
+                utils.renderTable('payments-tbody', res.data.data || [], p => `
+        <tr>
+          <td>${p.receipt_number || '—'}</td>
+          <td>${p.student_name}</td>
+          <td><strong>${utils.formatCurrency(p.amount_paid)}</strong></td>
+          <td>${p.payment_mode}</td>
+          <td>${utils.formatDate(p.payment_date)}</td>
+        </tr>`);
+            }
+            const fsRes = await api.get('/fees/structures');
+            if (fsRes?.ok) utils.populateSelect('payment-fee-structure', fsRes.data.data || [], 'fee_structure_id', f => `${f.course_name} Sem ${f.semester_number}`, 'Select Fee Structure');
+        }
+
+        // --- Balance ---
+        async function searchBalance() {
+            const query = document.getElementById('balance-search').value.trim();
+            if (!query) return;
+            const res = await api.get('/students', { search: query });
+            const students = res?.data?.data || [];
+            if (!students.length) { utils.toast('No student found', 'warning'); return; }
+            const student = students[0];
+            const balRes = await api.get(`/fees/balance/${student.student_id}`);
+            if (balRes?.ok) {
+                const b = balRes.data.data;
+                document.getElementById('balance-result').style.display = '';
+                document.getElementById('balance-content').innerHTML = `
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-icon blue">💰</div><div class="stat-info"><div class="stat-value">${utils.formatCurrency(b.total_fee)}</div><div class="stat-label">Total Fee</div></div></div>
+          <div class="stat-card"><div class="stat-icon green">✅</div><div class="stat-info"><div class="stat-value">${utils.formatCurrency(b.total_paid)}</div><div class="stat-label">Paid</div></div></div>
+          <div class="stat-card"><div class="stat-icon red">⚠️</div><div class="stat-info"><div class="stat-value">${utils.formatCurrency(b.balance)}</div><div class="stat-label">Balance</div></div></div>
+        </div>`;
+            }
+        }
+
+        // --- Structures ---
+        async function loadStructures() {
+            const res = await api.get('/fees/structures');
+            if (res?.ok) {
+                utils.renderTable('structures-tbody', res.data.data || [], s => `
+        <tr>
+            <td>${s.course_name}</td>
+            <td>Semester ${s.semester_number}</td>
+            <td>${s.category_name}</td>
+            <td>${s.year_label}</td>
+            <td><strong>${utils.formatCurrency(s.total_amount)}</strong></td>
+        </tr>`);
+            }
+        }
+
+        async function openAddStructure() {
+            const [cRes, ayRes, fcRes] = await Promise.all([
+                api.get('/courses'),
+                api.get('/college/academic-years'),
+                api.get('/fees/categories')
+            ]);
+
+            if (cRes?.ok) utils.populateSelect('fs-course', cRes.data.data || [], 'course_id', 'name', 'Select Course');
+            if (ayRes?.ok) utils.populateSelect('fs-academic-year', ayRes.data.data || [], 'academic_year_id', 'year_label', 'Select AY');
+            if (fcRes?.ok) utils.populateSelect('fs-category', fcRes.data.data || [], 'fee_category_id', 'name', 'Select Category');
+
+            utils.openModal('add-structure-modal');
+        }
+
+        async function saveStructure() {
+            const data = {
+                course_id: document.getElementById('fs-course').value,
+                academic_year_id: document.getElementById('fs-academic-year').value,
+                fee_category_id: document.getElementById('fs-category').value,
+                semester_number: document.getElementById('fs-semester').value,
+                total_amount: document.getElementById('fs-amount').value
+            };
+
+            const res = await api.post('/fees/structures', data);
+            if (res?.ok) {
+                utils.toast('Fee structure added!', 'success');
+                utils.closeModal('add-structure-modal');
+                loadStructures();
+            } else {
+                utils.toast(res?.data?.message || 'Failed', 'error');
+            }
+        }
+
+        // --- Scholarships ---
+        async function loadScholarships() {
+            const res = await api.get('/fees/scholarships');
+            if (res?.ok) {
+                utils.renderTable('scholarships-tbody', res.data.data || [], s => `
+        <tr>
+          <td>${s.student_name}</td>
+          <td>${s.scholarship_name}</td>
+          <td>${utils.formatCurrency(s.amount)}</td>
+          <td>${utils.statusBadge(s.status)}</td>
+          <td>
+            <button class="btn btn-success btn-sm" onclick="updateScholarship(${s.scholarship_id},'approved')">Approve</button>
+            <button class="btn btn-danger btn-sm" onclick="updateScholarship(${s.scholarship_id},'rejected')">Reject</button>
+          </td>
+        </tr>`);
+            }
+        }
+
+        async function updateScholarship(id, status) {
+            const res = await api.put(`/fees/scholarships/${id}`, { status });
+            if (res?.ok) { utils.toast('Updated!', 'success'); loadScholarships(); }
+        }
+
+        // --- Payments ---
+        async function savePayment() {
+            const studentId = document.getElementById('payment-student-id').value;
+            const feeStructureId = document.getElementById('payment-fee-structure').value;
+            const form = utils.getFormData('payment-form');
+            const res = await api.post('/fees/payments', { ...form, student_id: studentId, fee_structure_id: feeStructureId, academic_year_id: 1 }); // Hardcoded AY for now or fetch it
+            if (res?.ok) { utils.toast('Payment recorded!', 'success'); utils.closeModal('add-payment-modal'); init(); }
+            else utils.toast(res?.data?.message || 'Failed', 'error');
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

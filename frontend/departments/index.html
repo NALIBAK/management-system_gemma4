@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Departments — CMS</title>
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/aira.css">
+</head>
+
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">🎓</div>
+                <div class="logo-text">CMS <span>College Management</span></div>
+            </div>
+            <nav class="sidebar-nav"></nav>
+        </aside>
+        <div class="main-content">
+            <header class="header" id="page-header"></header>
+            <main class="page-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🏛️ Departments</h3>
+                        <button class="btn btn-primary btn-sm" onclick="openAdd()">➕ Add Department</button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>HOD</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dept-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="dept-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Add Department</h3>
+                <button class="modal-close" onclick="utils.closeModal('dept-modal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="dept-id">
+                <div class="form-group">
+                    <label class="form-label">Name <span class="required">*</span></label>
+                    <input type="text" id="dept-name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Code</label>
+                    <input type="text" id="dept-code" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Head of Department (HOD)</label>
+                    <select id="dept-hod" class="form-control">
+                        <option value="">-- Select HOD --</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="utils.closeModal('dept-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveDept()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/sidebar.js"></script>
+    <script src="../assets/js/aira.js"></script>
+    <script>
+        auth.requireAuth();
+        if (!auth.hasRole('super_admin', 'admin')) {
+            window.location.href = '../dashboard.html';
+        }
+        renderSidebar('departments');
+        renderHeader('Departments', 'Manage departments');
+
+        async function load() {
+            const [deptRes, staffRes] = await Promise.all([
+                api.get('/college/departments'),
+                api.get('/staff')
+            ]);
+
+            if (staffRes?.ok) {
+                const staffList = staffRes.data.data || [];
+                utils.populateSelect('dept-hod', staffList, 'staff_id', 'name', '-- Select HOD --');
+            }
+
+            if (deptRes?.ok) {
+                utils.renderTable('dept-tbody', deptRes.data.data || [], d => `
+        <tr>
+          <td>${d.code || '—'}</td>
+          <td><strong>${d.name}</strong></td>
+          <td>${d.hod_name || '—'}</td>
+          <td>
+            <button class="btn btn-ghost btn-sm" onclick="editDept(${d.department_id},'${d.name}','${d.code || ''}', '${d.hod_staff_id || ''}')">✏️ Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteDept(${d.department_id})">🗑️</button>
+          </td>
+        </tr>`);
+            }
+        }
+
+        function openAdd() {
+            document.getElementById('dept-id').value = '';
+            document.getElementById('dept-name').value = '';
+            document.getElementById('dept-code').value = '';
+            document.getElementById('dept-hod').value = '';
+            document.getElementById('modal-title').textContent = 'Add Department';
+            utils.openModal('dept-modal');
+        }
+
+        function editDept(id, name, code, hod_staff_id) {
+            document.getElementById('dept-id').value = id;
+            document.getElementById('dept-name').value = name;
+            document.getElementById('dept-code').value = code;
+            document.getElementById('dept-hod').value = (hod_staff_id && hod_staff_id !== 'null') ? hod_staff_id : '';
+            document.getElementById('modal-title').textContent = 'Edit Department';
+            utils.openModal('dept-modal');
+        }
+
+        async function saveDept() {
+            const id = document.getElementById('dept-id').value;
+            const data = {
+                name: document.getElementById('dept-name').value,
+                code: document.getElementById('dept-code').value,
+                hod_staff_id: document.getElementById('dept-hod').value || null
+            };
+            const res = id ? await api.put(`/college/departments/${id}`, data) : await api.post('/college/departments', data);
+            if (res?.ok) { utils.toast('Saved!', 'success'); utils.closeModal('dept-modal'); load(); }
+            else utils.toast(res?.data?.message || 'Failed', 'error');
+        }
+
+        async function deleteDept(id) {
+            utils.confirm('Delete this department?', async () => {
+                await api.delete(`/college/departments/${id}`); load();
+            });
+        }
+
+        load();
+    </script>
+</body>
+
+</html>

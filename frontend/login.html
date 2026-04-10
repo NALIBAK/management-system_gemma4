@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — College Management System</title>
+  <meta name="description" content="Sign in to the College Management System">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+    }
+
+    .login-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .login-logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .login-logo .logo-circle {
+      width: 72px;
+      height: 72px;
+      background: linear-gradient(135deg, #4f7ef8, #7c3aed);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin: 0 auto 16px;
+      box-shadow: 0 8px 24px rgba(79, 126, 248, 0.35);
+    }
+
+    .login-logo h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .login-logo p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 15px;
+      justify-content: center;
+      margin-top: 8px;
+    }
+
+    .login-error {
+      display: none;
+      background: var(--danger-light);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    .theme-toggle-wrap {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+    }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="theme-toggle-wrap">
+    <button class="theme-toggle" onclick="theme.toggle()" title="Toggle theme">🌙</button>
+  </div>
+
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="logo-circle">🎓</div>
+        <h1>College Management</h1>
+        <p>Sign in to your account</p>
+      </div>
+
+      <div class="login-error" id="login-error"></div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="username">Username <span class="required">*</span></label>
+          <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username"
+            autocomplete="username" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password <span class="required">*</span></label>
+          <div style="position: relative;">
+            <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password"
+              autocomplete="current-password" required style="padding-right: 45px;">
+            <button type="button" id="toggle-password"
+              style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 16px; color: var(--text-muted);"
+              title="Toggle password visibility">
+              👁️
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary login-btn" id="login-btn">
+          Sign In
+        </button>
+      </form>
+
+      <div class="login-footer">
+        College Management System &copy; 2025
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/theme.js?v=2"></script>
+  <script src="assets/js/api.js?v=2"></script>
+  <script src="assets/js/auth.js?v=2"></script>
+  <script>
+    // Redirect if already logged in
+    auth.requireGuest();
+
+    const togglePassword = document.getElementById('toggle-password');
+    const passwordInput = document.getElementById('password');
+
+    togglePassword.addEventListener('click', function () {
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        this.textContent = '🙈';
+      } else {
+        passwordInput.type = 'password';
+        this.textContent = '👁️';
+      }
+    });
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      console.log('Login form submitted');
+      const btn = document.getElementById('login-btn');
+      const errEl = document.getElementById('login-error');
+      errEl.style.display = 'none';
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      btn.disabled = true;
+      btn.textContent = 'Signing in...';
+
+      try {
+        console.log('Sending login request for:', username);
+        const res = await api.post('/auth/login', { username, password });
+        console.log('Login response:', res);
+
+        if (res && res.ok && res.data.success) {
+          console.log('Login successful, redirecting...');
+          auth.setSession(res.data.data.token, res.data.data.user);
+          window.location.href = 'dashboard.html';
+        } else {
+          console.error('Login failed:', res);
+          const msg = res?.data?.message || 'Login failed. Please try again.';
+          errEl.textContent = msg;
+          errEl.style.display = 'block';
+          alert('Login Failed: ' + msg); // Temporary alert for debugging
+          btn.disabled = false;
+          btn.textContent = 'Sign In';
+        }
+      } catch (err) {
+        console.error('Login exception:', err);
+        alert('Login Error: ' + err.message);
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+      }
+    });
+  </script>
+</body>
+
+</html>

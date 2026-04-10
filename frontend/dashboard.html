@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — College Management System</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/aira.css">
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">🎓</div>
+                <div class="logo-text">CMS <span>College Management</span></div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section-label">Main</div>
+                <a href="dashboard.html" class="nav-item active"><span class="nav-icon">🏠</span> Dashboard</a>
+                <a href="students/index.html" class="nav-item"><span class="nav-icon">👨‍🎓</span> Students</a>
+                <a href="staff/index.html" class="nav-item"><span class="nav-icon">👨‍🏫</span> Staff</a>
+                <div class="nav-section-label">Academics</div>
+                <a href="departments/index.html" class="nav-item"><span class="nav-icon">🏛️</span> Departments</a>
+                <a href="courses/index.html" class="nav-item"><span class="nav-icon">📚</span> Courses</a>
+                <a href="timetable/index.html" class="nav-item"><span class="nav-icon">🗓️</span> Timetable</a>
+                <a href="attendance/index.html" class="nav-item"><span class="nav-icon">✅</span> Attendance</a>
+                <a href="marks/index.html" class="nav-item"><span class="nav-icon">📝</span> Marks & Results</a>
+                <div class="nav-section-label">Administration</div>
+                <a href="fees/index.html" class="nav-item"><span class="nav-icon">💰</span> Fees</a>
+                <a href="reports/index.html" class="nav-item"><span class="nav-icon">📊</span> Reports</a>
+                <a href="notifications/index.html" class="nav-item"><span class="nav-icon">🔔</span> Notifications</a>
+                <div class="nav-section-label">System</div>
+                <a href="settings/index.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <header class="header">
+                <div>
+                    <div class="header-title">Dashboard</div>
+                    <div class="header-subtitle">Welcome back, <span id="user-name">—</span></div>
+                </div>
+                <div class="header-actions">
+                    <button class="theme-toggle" onclick="theme.toggle()">🌙</button>
+                    <div class="avatar" id="user-avatar">U</div>
+                    <button class="btn btn-ghost btn-sm" onclick="auth.logout()">Logout</button>
+                </div>
+            </header>
+
+            <main class="page-content">
+                <!-- Stats -->
+                <div class="stat-grid" id="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">👨‍🎓</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-students">—</div>
+                            <div class="stat-label">Total Students</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">👨‍🏫</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-staff">—</div>
+                            <div class="stat-label">Total Staff</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange">🏛️</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-depts">—</div>
+                            <div class="stat-label">Departments</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon red">⚠️</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-defaulters">—</div>
+                            <div class="stat-label">Fee Defaulters</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Department Summary -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="card-title">📊 Department Overview</h3>
+                        <a href="reports/index.html" class="btn btn-ghost btn-sm">View Reports →</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-wrapper">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Department</th>
+                                        <th>Students</th>
+                                        <th>Staff</th>
+                                        <th>Courses</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dept-table-body">
+                                    <tr>
+                                        <td colspan="4" style="text-align:center;padding:30px;color:var(--text-muted)">
+                                            Loading...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">⚡ Quick Actions</h3>
+                    </div>
+                    <div class="card-body">
+                        <div style="display:flex;flex-wrap:wrap;gap:12px">
+                            <a href="students/form.html" class="btn btn-primary">➕ Add Student</a>
+                            <a href="staff/form.html" class="btn btn-secondary">➕ Add Staff</a>
+                            <a href="attendance/index.html" class="btn btn-success">✅ Mark Attendance</a>
+                            <a href="marks/index.html" class="btn btn-warning">📝 Enter Marks</a>
+                            <a href="fees/index.html" class="btn btn-ghost">💰 Record Payment</a>
+                            <a href="reports/index.html" class="btn btn-ghost">📊 Generate Report</a>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="assets/js/theme.js?v=2"></script>
+    <script src="assets/js/api.js?v=2"></script>
+    <script src="assets/js/auth.js?v=2"></script>
+    <script src="assets/js/utils.js?v=2"></script>
+    <script src="assets/js/aira.js?v=2"></script>
+    <script>
+        auth.requireAuth();
+
+        const user = auth.getUser();
+        const role = user?.role || '';
+        const isAdmin = ['super_admin', 'admin'].includes(role);
+        document.getElementById('user-name').textContent = user?.username || '';
+        document.getElementById('user-avatar').textContent = auth.getUserInitials();
+
+        // --- Role-based UI visibility ---
+        // Hide Settings sidebar link for non-admins
+        if (!isAdmin) {
+            document.querySelectorAll('.sidebar-nav a').forEach(a => {
+                if (a.href.includes('settings/')) a.style.display = 'none';
+            });
+            // Also hide the "System" section label if settings is the only link
+            document.querySelectorAll('.nav-section-label').forEach(label => {
+                if (label.textContent.trim() === 'System') label.style.display = 'none';
+            });
+        }
+
+        // Hide admin-only Quick Action buttons for Staff/HOD
+        if (!isAdmin) {
+            const quickBtns = document.querySelectorAll('.card-body a.btn');
+            quickBtns.forEach(btn => {
+                const text = btn.textContent.trim();
+                if (text.includes('Add Student') || text.includes('Add Staff') || text.includes('Record Payment')) {
+                    btn.style.display = 'none';
+                }
+            });
+        }
+
+        // Update stat labels for scoped roles
+        if (!isAdmin) {
+            document.querySelectorAll('.stat-label').forEach(label => {
+                if (label.textContent === 'Total Students') label.textContent = 'My Students';
+                if (label.textContent === 'Total Staff') label.textContent = 'Dept Staff';
+            });
+        }
+
+        async function loadDashboard() {
+            // Load department summary
+            const deptRes = await api.get('/reports/department-summary');
+            if (deptRes?.ok && deptRes.data.data) {
+                const rows = deptRes.data.data;
+                let totalStudents = 0, totalStaff = 0;
+                utils.renderTable('dept-table-body', rows, r => {
+                    totalStudents += r.total_students || 0;
+                    totalStaff += r.total_staff || 0;
+                    return `<tr>
+          <td><strong>${r.department_name}</strong></td>
+          <td>${r.total_students}</td>
+          <td>${r.total_staff}</td>
+          <td>${r.total_courses}</td>
+        </tr>`;
+                });
+                document.getElementById('stat-students').textContent = totalStudents;
+                document.getElementById('stat-staff').textContent = totalStaff;
+                document.getElementById('stat-depts').textContent = rows.length;
+            }
+
+            // Load fee defaulters count
+            const ay = await api.get('/college/academic-years');
+            if (ay?.ok && ay.data.data?.length) {
+                const currentAY = ay.data.data.find(a => a.is_current) || ay.data.data[0];
+                const defRes = await api.get('/reports/fee-defaulters', { academic_year_id: currentAY.academic_year_id });
+                if (defRes?.ok) {
+                    document.getElementById('stat-defaulters').textContent = defRes.data.data?.length || 0;
+                }
+            }
+        }
+
+        loadDashboard();
+    </script>
+</body>
+
+</html>

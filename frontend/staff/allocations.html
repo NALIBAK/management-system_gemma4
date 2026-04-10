@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Allocations — CMS</title>
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/aira.css">
+</head>
+
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">🎓</div>
+                <div class="logo-text">CMS <span>College Management</span></div>
+            </div>
+            <nav class="sidebar-nav"></nav>
+        </aside>
+        <div class="main-content">
+            <header class="header" id="page-header"></header>
+            <main class="page-content">
+                <div class="card mb-4">
+                    <div class="card-body flex gap-3 items-center">
+                        <select id="filter-staff" class="form-control" style="width: 250px;">
+                            <option value="">All Staff</option>
+                        </select>
+                        <select id="filter-ay" class="form-control" style="width: 200px;">
+                            <option value="">All Academic Years</option>
+                        </select>
+                        <button class="btn btn-primary" style="margin-left: auto;" onclick="openAdd()">➕ Assign
+                            Class</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📖 Staff Class Allocations</h3>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Staff Name</th>
+                                    <th>Subject</th>
+                                    <th>Section</th>
+                                    <th>Academic Year</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="allocations-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Allocation Modal -->
+    <div class="modal-overlay" id="alloc-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Assign Class to Staff</h3>
+                <button class="modal-close" onclick="utils.closeModal('alloc-modal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Staff Member <span class="required">*</span></label>
+                    <select id="a-staff" class="form-control" required></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Subject <span class="required">*</span></label>
+                    <select id="a-subject" class="form-control" required></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Section <span class="required">*</span></label>
+                    <select id="a-section" class="form-control" required></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Academic Year <span class="required">*</span></label>
+                    <select id="a-ay" class="form-control" required></select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="utils.closeModal('alloc-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveAllocation()">Save Allocation</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/sidebar.js"></script>
+    <script src="../assets/js/aira.js"></script>
+    <script>
+        auth.requireAuth();
+        if (!auth.hasRole('super_admin', 'admin', 'hod')) {
+            window.location.href = '../dashboard.html';
+        }
+        renderSidebar('staff');
+        renderHeader('Class Allocations', 'Manage staff subject and section assignments');
+
+        async function init() {
+            const [staffRes, subRes, secRes, ayRes] = await Promise.all([
+                api.get('/staff'),
+                api.get('/courses/subjects'),
+                api.get('/students/sections'),
+                api.get('/college/academic-years')
+            ]);
+
+            if (staffRes?.ok) {
+                utils.populateSelect('filter-staff', staffRes.data.data || [], 'staff_id', 'name', 'All Staff');
+                utils.populateSelect('a-staff', staffRes.data.data || [], 'staff_id', 'name', 'Select Staff Member');
+            }
+            if (subRes?.ok) utils.populateSelect('a-subject', subRes.data.data || [], 'subject_id', 'name', 'Select Subject');
+            if (secRes?.ok) utils.populateSelect('a-section', secRes.data.data || [], 'section_id', 'name', 'Select Section');
+            if (ayRes?.ok) {
+                utils.populateSelect('filter-ay', ayRes.data.data || [], 'academic_year_id', 'year_label', 'All Academic Years');
+                utils.populateSelect('a-ay', ayRes.data.data || [], 'academic_year_id', 'year_label', 'Select Academic Year');
+            }
+
+            loadAllocations();
+        }
+
+        async function loadAllocations() {
+            const staffId = document.getElementById('filter-staff').value;
+            const ayId = document.getElementById('filter-ay').value;
+
+            let params = {};
+            if (staffId) params.staff_id = staffId;
+            if (ayId) params.academic_year_id = ayId;
+
+            const res = await api.get('/staff/allocations', params);
+            if (res?.ok) {
+                utils.renderTable('allocations-tbody', res.data.data || [], a => `
+        <tr>
+          <td><strong>${a.staff_name}</strong></td>
+          <td>${a.subject_name}</td>
+          <td>${a.section_name}</td>
+          <td>${a.year_label}</td>
+          <td>
+            <button class="btn btn-danger btn-sm" onclick="deleteAllocation(${a.allocation_id})">🗑️ Unassign</button>
+          </td>
+        </tr>`);
+            }
+        }
+
+        document.getElementById('filter-staff').addEventListener('change', loadAllocations);
+        document.getElementById('filter-ay').addEventListener('change', loadAllocations);
+
+        function openAdd() {
+            document.getElementById('a-staff').value = '';
+            document.getElementById('a-subject').value = '';
+            document.getElementById('a-section').value = '';
+            document.getElementById('a-ay').value = '';
+            utils.openModal('alloc-modal');
+        }
+
+        async function saveAllocation() {
+            const data = {
+                staff_id: document.getElementById('a-staff').value,
+                subject_id: document.getElementById('a-subject').value,
+                section_id: document.getElementById('a-section').value,
+                academic_year_id: document.getElementById('a-ay').value
+            };
+
+            if (!data.staff_id || !data.subject_id || !data.section_id || !data.academic_year_id) {
+                utils.toast('Please fill all required fields', 'error');
+                return;
+            }
+
+            const res = await api.post('/staff/allocations', data);
+            if (res?.ok) {
+                utils.toast('Class allocated successfully!', 'success');
+                utils.closeModal('alloc-modal');
+                loadAllocations();
+            } else {
+                utils.toast(res?.data?.message || 'Failed to allocate class', 'error');
+            }
+        }
+
+        async function deleteAllocation(id) {
+            utils.confirm('Remove this class allocation from the staff member?', async () => {
+                await api.delete(`/staff/allocations/${id}`);
+                loadAllocations();
+            });
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

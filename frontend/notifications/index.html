@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications — CMS</title>
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/aira.css">
+</head>
+
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">🎓</div>
+                <div class="logo-text">CMS <span>College Management</span></div>
+            </div>
+            <nav class="sidebar-nav"></nav>
+        </aside>
+        <div class="main-content">
+            <header class="header" id="page-header"></header>
+            <main class="page-content">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('send')">📤 Send Notification</button>
+                    <button class="tab-btn" onclick="switchTab('templates')">📋 Templates</button>
+                    <button class="tab-btn" onclick="switchTab('history')">📜 History</button>
+                </div>
+
+                <!-- Send Tab -->
+                <div id="tab-send">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">📤 Send Parent Notification</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Section</label>
+                                    <select class="form-control" id="notif-section"
+                                        onchange="loadSectionStudents()"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Channel</label>
+                                    <select class="form-control" id="notif-channel">
+                                        <option value="whatsapp">WhatsApp</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Template (optional)</label>
+                                    <select class="form-control" id="notif-template" onchange="applyTemplate()">
+                                        <option value="">Custom Message</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Message <span class="required">*</span></label>
+                                <textarea class="form-control" id="notif-message" rows="4"
+                                    placeholder="Use {StudentName}, {RollNumber}, {GuardianName} as placeholders..."></textarea>
+                                <div class="form-hint">Available placeholders: {StudentName}, {RollNumber}, {RegNumber},
+                                    {GuardianName}</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Select Students</label>
+                                <div class="flex gap-2 mb-2">
+                                    <button class="btn btn-ghost btn-sm" onclick="selectAll()">Select All</button>
+                                    <button class="btn btn-ghost btn-sm" onclick="deselectAll()">Deselect All</button>
+                                </div>
+                                <div id="student-checkboxes"
+                                    style="max-height:250px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-md);padding:12px">
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" onclick="sendNotification()">📤 Send Notification</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Templates Tab -->
+                <div id="tab-templates" style="display:none">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">📋 Notification Templates</h3>
+                            <button class="btn btn-primary btn-sm" onclick="utils.openModal('add-template-modal')">➕ Add
+                                Template</button>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Channel</th>
+                                        <th>Preview</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="templates-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Tab -->
+                <div id="tab-history" style="display:none">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">📜 Notification History</h3>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Channel</th>
+                                        <th>Message</th>
+                                        <th>Status</th>
+                                        <th>Sent At</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="history-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Add Template Modal -->
+    <div class="modal-overlay" id="add-template-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Add Template</h3>
+                <button class="modal-close" onclick="utils.closeModal('add-template-modal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="template-form">
+                    <div class="form-group">
+                        <label class="form-label">Title <span class="required">*</span></label>
+                        <input type="text" name="title" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Channel</label>
+                        <select name="channel_type" class="form-control">
+                            <option value="whatsapp">WhatsApp</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Content <span class="required">*</span></label>
+                        <textarea name="content_template" class="form-control" rows="5" required
+                            placeholder="Dear {GuardianName}, your ward {StudentName} (Roll: {RollNumber})..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="utils.closeModal('add-template-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveTemplate()">Save Template</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/sidebar.js"></script>
+    <script src="../assets/js/aira.js"></script>
+    <script>
+        auth.requireAuth();
+        renderSidebar('notifications');
+        renderHeader('Notifications', 'Send parent notifications');
+
+        let templates = [];
+
+        function switchTab(tab) {
+            ['send', 'templates', 'history'].forEach(t => {
+                document.getElementById(`tab-${t}`).style.display = t === tab ? '' : 'none';
+            });
+            document.querySelectorAll('.tab-btn').forEach((b, i) => {
+                b.classList.toggle('active', ['send', 'templates', 'history'][i] === tab);
+            });
+            if (tab === 'templates') loadTemplates();
+            if (tab === 'history') loadHistory();
+        }
+
+        async function init() {
+            const [sectRes, tmplRes] = await Promise.all([api.get('/students/sections'), api.get('/notifications/templates')]);
+            if (sectRes?.ok) utils.populateSelect('notif-section', sectRes.data.data || [], 'section_id', s => `${s.course_name} - ${s.name}`, 'Select Section');
+            if (tmplRes?.ok) {
+                templates = tmplRes.data.data || [];
+                const sel = document.getElementById('notif-template');
+                sel.innerHTML = '<option value="">Custom Message</option>' +
+                    templates.map(t => `<option value="${t.template_id}">${t.title}</option>`).join('');
+            }
+        }
+
+        async function loadSectionStudents() {
+            const sectionId = document.getElementById('notif-section').value;
+            if (!sectionId) return;
+            const res = await api.get('/students/', { section_id: sectionId });
+            const students = res?.data?.data || [];
+            document.getElementById('student-checkboxes').innerHTML = students.map(s => `
+      <label style="display:flex;align-items:center;gap:8px;padding:6px;cursor:pointer">
+        <input type="checkbox" class="student-check" value="${s.student_id}" checked>
+        <span>${s.name} (${s.roll_number})</span>
+      </label>`).join('') || '<p class="text-muted">No students found</p>';
+        }
+
+        function applyTemplate() {
+            const id = document.getElementById('notif-template').value;
+            if (!id) return;
+            const tmpl = templates.find(t => t.template_id == id);
+            if (tmpl) document.getElementById('notif-message').value = tmpl.content_template;
+        }
+
+        function selectAll() { document.querySelectorAll('.student-check').forEach(c => c.checked = true); }
+        function deselectAll() { document.querySelectorAll('.student-check').forEach(c => c.checked = false); }
+
+        async function sendNotification() {
+            const studentIds = [...document.querySelectorAll('.student-check:checked')].map(c => parseInt(c.value));
+            const message = document.getElementById('notif-message').value.trim();
+            const channel = document.getElementById('notif-channel').value;
+            const templateId = document.getElementById('notif-template').value;
+            if (!studentIds.length) { utils.toast('Select at least one student', 'warning'); return; }
+            if (!message && !templateId) { utils.toast('Enter a message or select a template', 'warning'); return; }
+            const res = await api.post('/notifications/send', { student_ids: studentIds, custom_message: message, channel_type: channel, template_id: templateId || null });
+            if (res?.ok) utils.toast(`Notification sent to ${res.data.data?.sent_count} students!`, 'success');
+            else utils.toast(res?.data?.message || 'Failed', 'error');
+        }
+
+        async function loadTemplates() {
+            const res = await api.get('/notifications/templates');
+            if (res?.ok) {
+                utils.renderTable('templates-tbody', res.data.data || [], t => `
+        <tr>
+          <td><strong>${t.title}</strong></td>
+          <td>${t.channel_type}</td>
+          <td class="text-muted truncate" style="max-width:200px">${t.content_template}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="deleteTemplate(${t.template_id})">🗑️</button></td>
+        </tr>`);
+            }
+        }
+
+        async function saveTemplate() {
+            const data = utils.getFormData('template-form');
+            const res = await api.post('/notifications/templates', data);
+            if (res?.ok) { utils.toast('Template saved!', 'success'); utils.closeModal('add-template-modal'); loadTemplates(); init(); }
+            else utils.toast(res?.data?.message || 'Failed', 'error');
+        }
+
+        async function deleteTemplate(id) {
+            utils.confirm('Delete this template?', async () => {
+                await api.delete(`/notifications/templates/${id}`);
+                loadTemplates(); init();
+            });
+        }
+
+        async function loadHistory() {
+            const res = await api.get('/notifications/history');
+            if (res?.ok) {
+                utils.renderTable('history-tbody', res.data.data || [], h => `
+        <tr>
+          <td>${h.student_name} (${h.roll_number})</td>
+          <td>${h.channel_type}</td>
+          <td class="text-muted" style="max-width:200px;overflow:hidden;text-overflow:ellipsis">${h.message_content}</td>
+          <td>${utils.statusBadge(h.status)}</td>
+          <td>${utils.formatDate(h.sent_at)}</td>
+        </tr>`);
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Form — CMS</title>
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/aira.css">
+</head>
+
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">🎓</div>
+                <div class="logo-text">CMS <span>College Management</span></div>
+            </div>
+            <nav class="sidebar-nav"></nav>
+        </aside>
+        <div class="main-content">
+            <header class="header" id="page-header"></header>
+            <main class="page-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title" id="form-title">Add Student</h3>
+                        <a href="index.html" class="btn btn-ghost btn-sm">← Back</a>
+                    </div>
+                    <div class="card-body">
+                        <form id="student-form">
+                            <input type="hidden" id="student-id">
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Reg Number <span class="required">*</span></label>
+                                    <input type="text" id="reg-number" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Roll Number</label>
+                                    <input type="text" id="roll-number" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Full Name <span class="required">*</span></label>
+                                    <input type="text" id="name" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" id="email" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Phone</label>
+                                    <input type="tel" id="phone" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Gender</label>
+                                    <select id="gender" class="form-control">
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Guardian Name</label>
+                                    <input type="text" id="guardian-name" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Guardian Phone (WhatsApp) <span
+                                            class="required">*</span></label>
+                                    <input type="tel" id="guardian-phone" class="form-control"
+                                        placeholder="+1234567890">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Course <span class="required">*</span></label>
+                                    <select id="course-id" class="form-control" required onchange="loadSections()">
+                                        <option value="">Select Course</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Batch <span class="required">*</span></label>
+                                    <select id="batch-id" class="form-control" required onchange="loadSections()">
+                                        <option value="">Select Batch</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Section <span class="required">*</span></label>
+                                    <select id="section-id" class="form-control" required>
+                                        <option value="">Select Section</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Student Category</label>
+                                    <select id="student-category" class="form-control">
+                                        <option value="regular">Regular</option>
+                                        <option value="centac">CENTAC</option>
+                                        <option value="management">Management</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Caste / Community</label>
+                                    <input type="text" id="caste-community" class="form-control"
+                                        placeholder="e.g. OC, BC, MBC, SC, ST">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Address</label>
+                                <textarea id="address" class="form-control" rows="2"></textarea>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary" id="save-btn">Save Student</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/sidebar.js"></script>
+    <script src="../assets/js/aira.js"></script>
+    <script>
+        auth.requireAuth();
+        renderSidebar('students');
+        renderHeader('Students', 'Manage student records');
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const studentId = urlParams.get('id');
+        const isView = urlParams.get('view');
+
+        async function loadOptions() {
+            const [courses, batches] = await Promise.all([
+                api.get('/courses'),
+                api.get('/students/batches')
+            ]);
+
+            if (courses?.ok) utils.populateSelect('course-id', courses.data.data || [], 'course_id', 'name', 'Select Course');
+            if (batches?.ok) utils.populateSelect('batch-id', batches.data.data || [], 'batch_id', 'label', 'Select Batch');
+        }
+
+        async function loadSections() {
+            const courseId = document.getElementById('course-id').value;
+            const batchId = document.getElementById('batch-id').value;
+            if (!courseId || !batchId) return;
+
+            const res = await api.get('/students/sections', { course_id: courseId, batch_id: batchId });
+            if (res?.ok) {
+                utils.populateSelect('section-id', res.data.data || [], 'section_id', 'name', 'Select Section');
+            }
+        }
+
+        async function loadStudent() {
+            if (!studentId) return;
+            document.getElementById('form-title').textContent = isView ? 'View Student' : 'Edit Student';
+            document.getElementById('student-id').value = studentId;
+
+            const res = await api.get(`/students/${studentId}`);
+            if (res?.ok) {
+                const s = res.data.data;
+                document.getElementById('reg-number').value = s.reg_number;
+                document.getElementById('roll-number').value = s.roll_number || '';
+                document.getElementById('name').value = s.name;
+                document.getElementById('email').value = s.email || '';
+                document.getElementById('phone').value = s.phone || '';
+                document.getElementById('guardian-name').value = s.guardian_name || '';
+                document.getElementById('guardian-phone').value = s.guardian_phone || '';
+                document.getElementById('gender').value = s.gender || 'male';
+                document.getElementById('address').value = s.address || '';
+                document.getElementById('student-category').value = s.student_category || 'regular';
+                document.getElementById('caste-community').value = s.caste_community || '';
+
+                document.getElementById('course-id').value = s.course_id;
+                document.getElementById('batch-id').value = s.batch_id;
+                await loadSections();
+                document.getElementById('section-id').value = s.section_id;
+                if (isView) {
+                    Array.from(document.forms[0].elements).forEach(e => e.disabled = true);
+                    document.getElementById('save-btn').style.display = 'none';
+                }
+            }
+        }
+
+        document.getElementById('student-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('save-btn');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            const data = {
+                reg_number: document.getElementById('reg-number').value,
+                roll_number: document.getElementById('roll-number').value,
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                guardian_name: document.getElementById('guardian-name').value,
+                guardian_phone: document.getElementById('guardian-phone').value,
+                gender: document.getElementById('gender').value,
+                address: document.getElementById('address').value,
+                course_id: document.getElementById('course-id').value,
+                batch_id: document.getElementById('batch-id').value,
+                section_id: document.getElementById('section-id').value,
+                student_category: document.getElementById('student-category').value,
+                caste_community: document.getElementById('caste-community').value || null
+            };
+
+            const res = studentId
+                ? await api.put(`/students/${studentId}`, data)
+                : await api.post('/students', data);
+
+            if (res?.ok) {
+                utils.toast('Student saved!', 'success');
+                setTimeout(() => window.location.href = 'index.html', 1000);
+            } else {
+                utils.toast(res?.data?.message || 'Failed', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Save Student';
+            }
+        });
+
+        (async () => {
+            await loadOptions();
+            await loadStudent();
+        })();
+    </script>
+</body>
+
+</html>

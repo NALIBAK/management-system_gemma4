@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Students — CMS</title>
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/aira.css">
+</head>
+
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">🎓</div>
+                <div class="logo-text">CMS <span>College Management</span></div>
+            </div>
+            <nav class="sidebar-nav"></nav>
+        </aside>
+        <div class="main-content">
+            <header class="header" id="page-header"></header>
+            <main class="page-content">
+                <!-- Filters -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="flex items-center gap-3" style="flex-wrap:wrap">
+                            <div class="search-bar">
+                                <span class="search-icon">🔍</span>
+                                <input type="text" class="form-control" id="search-input"
+                                    placeholder="Search by name, reg no...">
+                            </div>
+                            <select class="form-control" id="filter-section" style="width:200px">
+                                <option value="">All Sections</option>
+                            </select>
+                            <a href="form.html" class="btn btn-primary" style="margin-left:auto">➕ Add Student</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">👨‍🎓 Students</h3>
+                        <span id="student-count" class="badge badge-primary">—</span>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Roll No</th>
+                                    <th>Name</th>
+                                    <th>Reg Number</th>
+                                    <th>Course</th>
+                                    <th>Section</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="students-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/sidebar.js"></script>
+    <script src="../assets/js/aira.js"></script>
+    <script>
+        auth.requireAuth();
+        renderSidebar('students');
+        renderHeader('Students', 'Manage student records');
+
+        let allStudents = [];
+
+        async function loadStudents(params = {}) {
+            const res = await api.get('/students', params);
+            if (res?.ok) {
+                allStudents = res.data.data || [];
+                document.getElementById('student-count').textContent = allStudents.length;
+                utils.renderTable('students-tbody', allStudents, s => `
+        <tr>
+          <td>${s.roll_number || '—'}</td>
+          <td><strong>${s.name}</strong><br><small class="text-muted">${s.email || ''}</small></td>
+          <td>${s.reg_number}</td>
+          <td>${s.course_name}</td>
+          <td>${s.section_name}</td>
+          <td>${utils.statusBadge(s.status)}</td>
+          <td>
+            <a href="form.html?id=${s.student_id}" class="btn btn-ghost btn-sm">✏️ Edit</a>
+            <button class="btn btn-ghost btn-sm" onclick="viewStudent(${s.student_id})">👁️ View</button>
+          </td>
+        </tr>`);
+            }
+        }
+
+        async function loadSections() {
+            const res = await api.get('/students/sections');
+            if (res?.ok) {
+                utils.populateSelect('filter-section', res.data.data || [], 'section_id',
+                    s => `${s.batch_label} ${s.course_name} - ${s.name}`, 'All Sections');
+            }
+        }
+
+        function viewStudent(id) { window.location.href = `form.html?id=${id}&view=1`; }
+
+        document.getElementById('filter-section').onchange = function () {
+            loadStudents(this.value ? { section_id: this.value } : {});
+        };
+
+        const searchFn = utils.debounce((val) => {
+            loadStudents(val ? { search: val } : {});
+        }, 400);
+        document.getElementById('search-input').oninput = e => searchFn(e.target.value);
+
+        loadSections();
+        loadStudents();
+    </script>
+</body>
+
+</html>

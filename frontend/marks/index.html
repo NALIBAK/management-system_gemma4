@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marks & Results — CMS</title>
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/aira.css">
+</head>
+
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">🎓</div>
+                <div class="logo-text">CMS <span>College Management</span></div>
+            </div>
+            <nav class="sidebar-nav"></nav>
+        </aside>
+        <div class="main-content">
+            <header class="header" id="page-header"></header>
+            <main class="page-content">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('entry')">📝 Enter Marks</button>
+                    <button class="tab-btn" onclick="switchTab('results')">🏆 Results</button>
+                    <button class="tab-btn" onclick="switchTab('exams')">📋 Exams</button>
+                </div>
+
+                <!-- Enter Marks Tab -->
+                <div id="tab-entry">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h3 class="card-title">Select Exam</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Section</label>
+                                    <select class="form-control" id="marks-section" onchange="loadExams()"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Exam</label>
+                                    <select class="form-control" id="marks-exam"></select>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" onclick="loadMarksEntry()">Load Students</button>
+                        </div>
+                    </div>
+                    <div class="card" id="marks-entry-card" style="display:none">
+                        <div class="card-header">
+                            <h3 class="card-title">Enter Marks</h3>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Roll No</th>
+                                        <th>Name</th>
+                                        <th>Marks Obtained</th>
+                                        <th>Absent</th>
+                                        <th>Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="marks-tbody"></tbody>
+                            </table>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-primary" onclick="saveMarks()">💾 Save Marks</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Tab -->
+                <div id="tab-results" style="display:none">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Section</label>
+                                    <select class="form-control" id="res-section"></select>
+                                </div>
+                                <div class="form-group" style="display:flex;align-items:flex-end">
+                                    <button class="btn btn-primary" onclick="loadResults()">Load Results</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">🏆 Semester Results</h3>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Reg No</th>
+                                        <th>Name</th>
+                                        <th>Semester</th>
+                                        <th>GPA</th>
+                                        <th>CGPA</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="results-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exams Tab -->
+                <div id="tab-exams" style="display:none">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">📋 Exams</h3>
+                            <button class="btn btn-primary btn-sm" onclick="utils.openModal('add-exam-modal')">➕ Add
+                                Exam</button>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Exam Name</th>
+                                        <th>Subject</th>
+                                        <th>Type</th>
+                                        <th>Date</th>
+                                        <th>Max Marks</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="exams-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Add Exam Modal -->
+    <div class="modal-overlay" id="add-exam-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Add Exam</h3>
+                <button class="modal-close" onclick="utils.closeModal('add-exam-modal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="exam-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Exam Name <span class="required">*</span></label>
+                            <input type="text" name="exam_name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Exam Type</label>
+                            <select name="exam_type_id" class="form-control" id="exam-type-sel"></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Max Marks</label>
+                            <input type="number" name="max_marks" class="form-control" value="100">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Passing Marks</label>
+                            <input type="number" name="passing_marks" class="form-control" value="40">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Weightage %</label>
+                            <input type="number" name="weightage_percent" class="form-control" value="100">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Exam Date</label>
+                        <input type="date" name="exam_date" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="utils.closeModal('add-exam-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="addExam()">Add Exam</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/sidebar.js"></script>
+    <script src="../assets/js/aira.js"></script>
+    <script>
+        auth.requireAuth();
+        renderSidebar('marks');
+        renderHeader('Marks & Results', 'Enter marks and view results');
+
+        let studentsData = [], currentExam = null;
+
+        function switchTab(tab) {
+            ['entry', 'results', 'exams'].forEach(t => {
+                document.getElementById(`tab-${t}`).style.display = t === tab ? '' : 'none';
+            });
+            document.querySelectorAll('.tab-btn').forEach((b, i) => {
+                b.classList.toggle('active', ['entry', 'results', 'exams'][i] === tab);
+            });
+        }
+
+        async function init() {
+            const [sectRes, etRes] = await Promise.all([api.get('/students/sections'), api.get('/marks/exam-types')]);
+            if (sectRes?.ok) {
+                const opts = sectRes.data.data || [];
+                ['marks-section', 'res-section'].forEach(id => utils.populateSelect(id, opts, 'section_id', s => `${s.course_name} - ${s.name}`, 'Select Section'));
+            }
+            if (etRes?.ok) utils.populateSelect('exam-type-sel', etRes.data.data || [], 'exam_type_id', 'name', 'Select Type');
+            loadAllExams();
+        }
+
+        async function loadExams() {
+            const sectionId = document.getElementById('marks-section').value;
+            if (!sectionId) return;
+            const res = await api.get('/marks/exams', { section_id: sectionId });
+            if (res?.ok) utils.populateSelect('marks-exam', res.data.data || [], 'exam_id', e => `${e.exam_name} — ${e.subject_name}`, 'Select Exam');
+        }
+
+        async function loadMarksEntry() {
+            const examId = document.getElementById('marks-exam').value;
+            const sectionId = document.getElementById('marks-section').value;
+            if (!examId || !sectionId) { utils.toast('Select section and exam', 'warning'); return; }
+            const [studRes, marksRes] = await Promise.all([
+                api.get('/students/', { section_id: sectionId }),
+                api.get('/marks/marks', { exam_id: examId })
+            ]);
+            studentsData = studRes?.data?.data || [];
+            const existingMarks = {};
+            (marksRes?.data?.data || []).forEach(m => existingMarks[m.student_id] = m);
+            document.getElementById('marks-entry-card').style.display = '';
+            utils.renderTable('marks-tbody', studentsData, s => {
+                const m = existingMarks[s.student_id] || {};
+                return `<tr>
+        <td>${s.roll_number}</td>
+        <td>${s.name}</td>
+        <td><input type="number" class="form-control" id="m_${s.student_id}" value="${m.marks_obtained || ''}" min="0" style="width:100px"></td>
+        <td><input type="checkbox" id="abs_${s.student_id}" ${m.is_absent ? 'checked' : ''}></td>
+        <td><input type="text" class="form-control" id="rem_${s.student_id}" value="${m.remarks || ''}" style="width:150px"></td>
+      </tr>`;
+            });
+        }
+
+        async function saveMarks() {
+            const examId = document.getElementById('marks-exam').value;
+            const marks = studentsData.map(s => ({
+                student_id: s.student_id,
+                marks_obtained: parseFloat(document.getElementById(`m_${s.student_id}`)?.value || 0),
+                is_absent: document.getElementById(`abs_${s.student_id}`)?.checked || false,
+                remarks: document.getElementById(`rem_${s.student_id}`)?.value || ''
+            }));
+            const res = await api.post('/marks/marks', { exam_id: examId, marks });
+            if (res?.ok) utils.toast('Marks saved!', 'success');
+            else utils.toast(res?.data?.message || 'Failed', 'error');
+        }
+
+        async function loadResults() {
+            const sectionId = document.getElementById('res-section').value;
+            if (!sectionId) { utils.toast('Select a section', 'warning'); return; }
+            const res = await api.get('/marks/results');
+            if (res?.ok) {
+                utils.renderTable('results-tbody', res.data.data || [], r => `
+        <tr>
+          <td>${r.reg_number}</td>
+          <td>${r.student_name}</td>
+          <td>Sem ${r.semester_number}</td>
+          <td><strong>${r.gpa}</strong></td>
+          <td><strong>${r.cgpa}</strong></td>
+          <td>${utils.statusBadge(r.result_status)}</td>
+        </tr>`);
+            }
+        }
+
+        async function loadAllExams() {
+            const res = await api.get('/marks/exams');
+            if (res?.ok) {
+                utils.renderTable('exams-tbody', res.data.data || [], e => `
+        <tr>
+          <td>${e.exam_name}</td>
+          <td>${e.subject_name}</td>
+          <td>${e.exam_type_name}</td>
+          <td>${utils.formatDate(e.exam_date)}</td>
+          <td>${e.max_marks}</td>
+        </tr>`);
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
