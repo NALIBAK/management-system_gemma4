@@ -1119,7 +1119,7 @@ def _smart_fallback(message: str, user: dict, messages: list = None) -> str:
                 res = execute_tool("generate_report", {"report_type": "cgpa", "format": fmt, **args}, user)
                 label = f"{dept_label} " if dept_label else ""
                 if res.get("response_type") == "report":
-                    return f"✅ **{label}Student Report Generated**\n\nClick here to download: [{res['filename']}](http://localhost:6000{res['download_url']})"
+                    return f"✅ **{label}Student Report Generated**\n\nClick here to download: [{res['filename']}](http://localhost:5000{res['download_url']})"
                 return "❌ Failed to generate the department student report."
             else:
                 # Just show in chat
@@ -1184,7 +1184,7 @@ def _smart_fallback(message: str, user: dict, messages: list = None) -> str:
             if rt:
                 res = execute_tool("generate_report", {"report_type": rt, "format": fmt}, user)
                 if res.get("response_type") == "report":
-                    return f"✅ **Report Generated Successfully**\n\nClick here to download: [{res['filename']}](http://localhost:6000{res['download_url']})"
+                    return f"✅ **Report Generated Successfully**\n\nClick here to download: [{res['filename']}](http://localhost:5000{res['download_url']})"
                 return "❌ Failed to generate report file."
 
         # CGPA / Student Profile Report
@@ -1451,6 +1451,32 @@ I didn't find a direct match, but I'm here to help! Here are things I can answer
 @login_required
 def get_tools():
     return success(MCP_TOOLS)
+
+@aira_bp.route("/ollama-models", methods=["GET"])
+@login_required
+def get_ollama_models():
+    """Proxy Ollama's /api/tags to return available local models.
+    Allows frontend to fetch models without direct browser→Ollama CORS issues.
+    """
+    ollama_url = "http://localhost:11434"
+    try:
+        resp = http_requests.get(f"{ollama_url}/api/tags", timeout=4)
+        resp.raise_for_status()
+        data = resp.json()
+        models = data.get("models", [])
+        # Return simplified list: name + size
+        simplified = [
+            {
+                "name": m.get("name"),
+                "size_bytes": m.get("size", 0),
+                "size_gb": round(m.get("size", 0) / 1e9, 2) if m.get("size") else None,
+                "family": m.get("details", {}).get("family", ""),
+            }
+            for m in models
+        ]
+        return success({"models": simplified, "count": len(simplified)})
+    except Exception as e:
+        return error(f"Could not reach Ollama at {ollama_url}: {str(e)}", 503)
 
 @aira_bp.route("/execute-tool", methods=["POST"])
 @login_required

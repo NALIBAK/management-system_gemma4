@@ -4,29 +4,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login — College Management System</title>
-  <meta name="description" content="Sign in to the College Management System">
-  <link rel="stylesheet" href="assets/css/main.css">
+  <title>Login &mdash; College Management System</title>
+  <meta name="description" content="Sign in to the College Management System powered by Gemma 4">
+  <link rel="stylesheet" href="assets/css/main.css?v=3">
   <style>
     body {
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
+      background: var(--bg-primary);
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(ellipse at 20% 50%, rgba(201, 100, 66, 0.05) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(201, 100, 66, 0.04) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
     }
 
     .login-container {
       width: 100%;
-      max-width: 420px;
+      max-width: 440px;
       padding: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .login-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-light);
+      border: 1px solid rgba(201, 100, 66, 0.2);
+      border-radius: var(--radius-full);
+      padding: 4px 14px;
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 500;
+      margin-bottom: 20px;
+      letter-spacing: 0.02em;
     }
 
     .login-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
+      border-radius: var(--radius-xl);
       padding: 40px;
-      box-shadow: var(--shadow-lg);
+      box-shadow: var(--shadow-md);
     }
 
     .login-logo {
@@ -34,29 +64,39 @@
       margin-bottom: 32px;
     }
 
-    .login-logo .logo-circle {
-      width: 72px;
-      height: 72px;
-      background: linear-gradient(135deg, #4f7ef8, #7c3aed);
-      border-radius: 20px;
+    .login-logo .logo-mark {
+      width: 68px;
+      height: 68px;
+      background: var(--accent);
+      border-radius: var(--radius-xl);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 36px;
-      margin: 0 auto 16px;
-      box-shadow: 0 8px 24px rgba(79, 126, 248, 0.35);
+      font-size: 30px;
+      margin: 0 auto 18px;
+      box-shadow: var(--accent) 0px 0px 0px 0px, var(--accent) 0px 0px 0px 4px, rgba(0,0,0,0.08) 0px 8px 24px;
     }
 
     .login-logo h1 {
+      font-family: var(--font-serif);
       font-size: 22px;
-      font-weight: 800;
+      font-weight: 500;
       color: var(--text-primary);
+      line-height: 1.2;
+      letter-spacing: -0.01em;
     }
 
     .login-logo p {
-      font-size: 13px;
+      font-size: 14px;
       color: var(--text-muted);
-      margin-top: 4px;
+      margin-top: 6px;
+      font-weight: 400;
+    }
+
+    .login-divider {
+      border: none;
+      border-top: 1px solid var(--border-subtle);
+      margin: 0 0 24px;
     }
 
     .login-btn {
@@ -65,13 +105,15 @@
       font-size: 15px;
       justify-content: center;
       margin-top: 8px;
+      border-radius: var(--radius-lg);
+      letter-spacing: 0.01em;
     }
 
     .login-error {
       display: none;
       background: var(--danger-light);
       color: var(--danger);
-      border: 1px solid var(--danger);
+      border: 1px solid rgba(181, 51, 51, 0.25);
       border-radius: var(--radius-md);
       padding: 10px 14px;
       font-size: 13px;
@@ -82,48 +124,72 @@
       position: fixed;
       top: 20px;
       right: 20px;
+      z-index: 10;
     }
 
     .login-footer {
       text-align: center;
-      margin-top: 24px;
+      margin-top: 28px;
       font-size: 12px;
       color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .login-footer a {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    [data-theme="dark"] .login-logo .logo-mark {
+      box-shadow: var(--accent) 0px 0px 0px 0px, rgba(217, 119, 87, 0.25) 0px 0px 0px 4px, rgba(0,0,0,0.4) 0px 8px 24px;
+    }
+
+    [data-theme="dark"] body::before {
+      background-image:
+        radial-gradient(ellipse at 20% 50%, rgba(217, 119, 87, 0.06) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(217, 119, 87, 0.04) 0%, transparent 50%);
     }
   </style>
 </head>
 
 <body>
   <div class="theme-toggle-wrap">
-    <button class="theme-toggle" onclick="theme.toggle()" title="Toggle theme">🌙</button>
+    <button class="theme-toggle" onclick="theme.toggle()" title="Toggle theme" id="theme-toggle-btn">&#x1F319;</button>
   </div>
 
   <div class="login-container">
+    <div style="text-align:center;">
+      <span class="login-badge">&#10022; Gemma 4 Powered &middot; Offline First</span>
+    </div>
+
     <div class="login-card">
       <div class="login-logo">
-        <div class="logo-circle">🎓</div>
+        <div class="logo-mark">&#x1F393;</div>
         <h1>College Management</h1>
-        <p>Sign in to your account</p>
+        <p>Sign in to your secure account</p>
       </div>
+
+      <hr class="login-divider">
 
       <div class="login-error" id="login-error"></div>
 
       <form id="login-form">
         <div class="form-group">
           <label class="form-label" for="username">Username <span class="required">*</span></label>
-          <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username"
-            autocomplete="username" required>
+          <input type="text" id="username" name="username" class="form-control"
+            placeholder="Enter your username" autocomplete="username" required>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="password">Password <span class="required">*</span></label>
           <div style="position: relative;">
-            <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password"
-              autocomplete="current-password" required style="padding-right: 45px;">
+            <input type="password" id="password" name="password" class="form-control"
+              placeholder="Enter your password" autocomplete="current-password" required
+              style="padding-right: 46px;">
             <button type="button" id="toggle-password"
-              style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 16px; color: var(--text-muted);"
+              style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 15px; color: var(--text-muted); padding: 4px; line-height: 1;"
               title="Toggle password visibility">
-              👁️
+              &#x1F441;&#xFE0F;
             </button>
           </div>
         </div>
@@ -134,17 +200,24 @@
       </form>
 
       <div class="login-footer">
-        College Management System &copy; 2025
+        College Management System &copy; 2026 &middot;
+        <a href="https://github.com/NALIBAK/management-system_gemma4" target="_blank">GitHub</a>
       </div>
     </div>
   </div>
 
-  <script src="assets/js/theme.js?v=2"></script>
-  <script src="assets/js/api.js?v=2"></script>
-  <script src="assets/js/auth.js?v=2"></script>
+  <script src="assets/js/theme.js?v=3"></script>
+  <script src="assets/js/api.js?v=3"></script>
+  <script src="assets/js/auth.js?v=3"></script>
   <script>
-    // Redirect if already logged in
     auth.requireGuest();
+
+    function syncThemeIcon() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.getElementById('theme-toggle-btn').innerHTML = isDark ? '&#x2600;&#xFE0F;' : '&#x1F319;';
+    }
+    syncThemeIcon();
+    document.getElementById('theme-toggle-btn').addEventListener('click', syncThemeIcon);
 
     const togglePassword = document.getElementById('toggle-password');
     const passwordInput = document.getElementById('password');
@@ -152,16 +225,15 @@
     togglePassword.addEventListener('click', function () {
       if (passwordInput.type === 'password') {
         passwordInput.type = 'text';
-        this.textContent = '🙈';
+        this.innerHTML = '&#x1F648;';
       } else {
         passwordInput.type = 'password';
-        this.textContent = '👁️';
+        this.innerHTML = '&#x1F441;&#xFE0F;';
       }
     });
 
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      console.log('Login form submitted');
       const btn = document.getElementById('login-btn');
       const errEl = document.getElementById('login-error');
       errEl.style.display = 'none';
@@ -173,26 +245,21 @@
       btn.textContent = 'Signing in...';
 
       try {
-        console.log('Sending login request for:', username);
         const res = await api.post('/auth/login', { username, password });
-        console.log('Login response:', res);
 
         if (res && res.ok && res.data.success) {
-          console.log('Login successful, redirecting...');
           auth.setSession(res.data.data.token, res.data.data.user);
           window.location.href = 'dashboard.html';
         } else {
-          console.error('Login failed:', res);
-          const msg = res?.data?.message || 'Login failed. Please try again.';
+          const msg = res?.data?.message || 'Login failed. Please check your credentials.';
           errEl.textContent = msg;
           errEl.style.display = 'block';
-          alert('Login Failed: ' + msg); // Temporary alert for debugging
           btn.disabled = false;
           btn.textContent = 'Sign In';
         }
       } catch (err) {
-        console.error('Login exception:', err);
-        alert('Login Error: ' + err.message);
+        errEl.textContent = 'Connection error: ' + err.message;
+        errEl.style.display = 'block';
         btn.disabled = false;
         btn.textContent = 'Sign In';
       }

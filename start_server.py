@@ -28,7 +28,7 @@ ROOT       = os.path.dirname(os.path.abspath(__file__))
 BACKEND    = os.path.join(ROOT, "backend")
 FRONTEND   = os.path.join(ROOT, "frontend")
 WHATSAPP   = os.path.join(ROOT, "whatsapp_service")
-BACKEND_PORT  = 6000
+BACKEND_PORT  = 5000
 FRONTEND_PORT = 9000
 WHATSAPP_PORT = 4000
 

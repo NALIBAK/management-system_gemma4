@@ -2,7 +2,7 @@ import requests
 import json
 import sys
 
-BASE_URL = "http://localhost:6000/api"
+BASE_URL = "http://localhost:5000/api"
 
 def write_log(msg):
     with open("api_seed_report.txt", "a", encoding="utf-8") as f:

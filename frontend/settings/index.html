@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings — CMS</title>
-    <link rel="stylesheet" href="../assets/css/main.css">
-    <link rel="stylesheet" href="../assets/css/aira.css">
+    <link rel="stylesheet" href="../assets/css/main.css?v=3">
+    <link rel="stylesheet" href="../assets/css/aira.css?v=3">
 </head>
 
 <body>
@@ -45,8 +45,18 @@
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">Model</label>
-                                        <input type="text" name="selected_model" class="form-control" id="llm-model"
-                                            placeholder="e.g. gemma4:e4b, gemini-1.5-flash">
+                                        <div style="display:flex;gap:8px;align-items:center">
+                                            <select name="selected_model" class="form-control" id="llm-model" style="flex:1">
+                                                <option value="gemma4:e4b" selected>gemma4:e4b (default)</option>
+                                            </select>
+                                            <button type="button" class="btn btn-ghost btn-sm" onclick="fetchOllamaModels()" title="Refresh available models from Ollama" id="ollama-refresh-btn"
+                                                style="flex-shrink:0;white-space:nowrap">
+                                                &#x21BA; Refresh
+                                            </button>
+                                        </div>
+                                        <div class="form-hint" id="ollama-model-status" style="margin-top:6px">
+                                            Fetching available models from Ollama&hellip;
+                                        </div>
                                     </div>
                                 </div>
 
@@ -222,12 +232,93 @@
             // Function preserved for backwards compatibility with inline scripts, purposefully empty
         }
 
+        const DEFAULT_MODEL = 'gemma4:e4b';
+        // OLLAMA_API is proxied through the backend at /api/aira/ollama-models
+
+        /**
+         * Fetch all locally available models from Ollama and populate the dropdown.
+         * Falls back gracefully if Ollama is not running.
+         */
+        async function fetchOllamaModels() {
+            const select = document.getElementById('llm-model');
+            const status = document.getElementById('ollama-model-status');
+            const btn = document.getElementById('ollama-refresh-btn');
+            const currentVal = select.value || DEFAULT_MODEL;
+
+            btn.disabled = true;
+            btn.textContent = 'Loading...';
+            status.textContent = 'Fetching available models from Ollama...';
+            status.style.color = 'var(--text-muted)';
+
+            try {
+                const res = await api.get('/aira/ollama-models');
+                if (!res || !res.ok) throw new Error(res?.data?.message || 'Ollama unreachable');
+                const models = res.data.data?.models || [];
+
+                // Rebuild options
+                select.innerHTML = '';
+
+                // Always ensure default is available even if not in list
+                const hasDefault = models.some(m => m.name === DEFAULT_MODEL);
+                if (!hasDefault) {
+                    const opt = document.createElement('option');
+                    opt.value = DEFAULT_MODEL;
+                    opt.textContent = DEFAULT_MODEL + ' (default — not yet pulled)';
+                    select.appendChild(opt);
+                }
+
+                models.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m.name;
+                    const sizeLabel = m.size_gb ? '  — ' + m.size_gb + ' GB' : '';
+                    const familyLabel = m.family ? ' [' + m.family + ']' : '';
+                    opt.textContent = m.name + sizeLabel + familyLabel;
+                    if (m.name === DEFAULT_MODEL) opt.textContent += '  ★';
+                    select.appendChild(opt);
+                });
+
+                // Restore previously saved value, fallback to default
+                select.value = currentVal || DEFAULT_MODEL;
+                if (!select.value) select.value = DEFAULT_MODEL;
+
+                const count = models.length;
+                status.textContent = '✓ Found ' + count + ' local model' + (count !== 1 ? 's' : '') + ' — select one or click Refresh to reload.';
+                status.style.color = 'var(--success)';
+            } catch (err) {
+                // Ollama is offline or unreachable — keep default option, show warning
+                if (!(select.querySelector('option[value="' + DEFAULT_MODEL + '"]'))) {
+                    select.innerHTML = '<option value="' + DEFAULT_MODEL + '">' + DEFAULT_MODEL + ' (default)</option>';
+                }
+                select.value = currentVal || DEFAULT_MODEL;
+                status.textContent = '⚠ Ollama is offline or not running. Default model kept.';
+                status.style.color = 'var(--warning)';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '&#x21BA; Refresh';
+            }
+        }
+
         async function init() {
+            // Fetch Ollama models first (non-blocking — runs concurrently)
+            fetchOllamaModels();
+
             const [llmRes, colRes] = await Promise.all([api.get('/aira/config'), api.get('/college/')]);
             if (llmRes?.ok && llmRes.data.data) {
                 const c = llmRes.data.data;
                 document.getElementById('llm-provider').value = c.provider || 'ollama';
-                document.getElementById('llm-model').value = c.selected_model || '';
+                // Apply saved model after models may have loaded
+                const savedModel = c.selected_model || DEFAULT_MODEL;
+                setTimeout(() => {
+                    const sel = document.getElementById('llm-model');
+                    // If option exists, select it; otherwise add and select
+                    if (!sel.querySelector('option[value="' + savedModel + '"]')) {
+                        const opt = document.createElement('option');
+                        opt.value = savedModel;
+                        opt.textContent = savedModel + ' (saved)';
+                        sel.insertBefore(opt, sel.firstChild);
+                    }
+                    sel.value = savedModel;
+                }, 500);
                 document.getElementById('llm-temp').value = c.temperature || 0.7;
                 document.getElementById('llm-tokens').value = c.max_tokens || 2048;
             }

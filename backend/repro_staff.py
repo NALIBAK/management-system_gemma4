@@ -1,7 +1,7 @@
 import requests
 import json
 
-url = "http://localhost:6000/api/staff/"
+url = "http://localhost:5000/api/staff/"
 headers = {
     # Assuming we can get a token or relying on verify_token override for debug?
     # actually, I need a token. I'll login first.
@@ -9,7 +9,7 @@ headers = {
 }
 
 # Login to get token
-login_url = "http://localhost:6000/api/auth/login"
+login_url = "http://localhost:5000/api/auth/login"
 login_data = {"username": "superadmin", "password": "Admin@123"}
 session = requests.Session()
 try:
