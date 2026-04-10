@@ -12,7 +12,7 @@ Educational administrators waste countless hours manually generating reports spa
 AIRA autonomously fetches SQLite data based on mathematical Role-Based Access Controls (Admin vs. Faculty vs. Student) via Function Calling, generating PDF/Excel reports in milliseconds.
 
 ## Features
-- 🤖 **Offline Gemma 4 Routing**: Connects to `gemma4:4b` via local Ollama. No cloud APIs, no data leaks.
+- 🤖 **Offline Gemma 4 Routing**: Connects to `gemma4:e4b` via local Ollama. No cloud APIs, no data leaks.
 - 🔒 **Role-Based Context Windows**: The prompt dynamically scopes. Faculty only see *their* students. Admins see *all* students.
 - 📊 **Natural Language DB**: "Show me fee defaulters in CS Dept" -> Automatically extracts parameterized JSON, hits SQLite, and builds a UI table.
 - 📱 **WhatsApp Automations**: Hooks natively for localized alerting.
@@ -44,9 +44,9 @@ Requires [uv Python manager](https://github.com/astral-sh/uv) and Node.js.
 2. **Start Ollama Locally**:
    Ensure Ollama is running on port 11434 with Gemma 4 installed:
    ```bash
-   ollama run gemma3:1b
+   ollama run gemma4:e4b
    # Or for heavier hardware:
-   ollama run gemma4:4b
+   ollama run gemma4:e4b
    ```
 
 3. **Install Dependencies & Boot**:

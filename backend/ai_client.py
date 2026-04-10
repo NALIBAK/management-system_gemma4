@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma4:4b")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma4:e4b")
 AI_MODE = os.getenv("AI_MODE", "local")
 
 class AIClientError(Exception):

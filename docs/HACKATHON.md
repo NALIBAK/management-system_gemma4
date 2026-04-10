@@ -26,6 +26,6 @@ The architecture was carefully designed to separate concerns while optimizing fo
 ## 4. Accessibility (Offline & Low-Bandwidth) (15%)
 We recognized early on that a massive barrier to AI adoption in rural education is consistent high-bandwidth internet.
 
-- **100% Offline Capable**: By wrapping `gemma4:4b` using our `ai_client.py` and `Ollama`, the entire system (Database, Chat Interface, LLM reasoning) runs completely disconnected from the internet.
+- **100% Offline Capable**: By wrapping `gemma4:e4b` using our `ai_client.py` and `Ollama`, the entire system (Database, Chat Interface, LLM reasoning) runs completely disconnected from the internet.
 - **Graceful UI Status Indicators**: The frontend constantly polls port 11434 and indicates offline/online status clearly to the user, rendering a UI without "Cloud API Keys".
 - **Hardware Agnostic Frontend**: The UI dynamically collapses, utilizing caching paradigms, to remain hyper-responsive on low-end hardware.

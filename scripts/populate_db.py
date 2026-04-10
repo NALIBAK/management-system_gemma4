@@ -806,7 +806,7 @@ def main():
     # ---- STEP 26: LLM CONFIG ----
     print("\n[STEP 26] Creating LLM config...")
     run(conn, """INSERT INTO llm_config (college_id, provider, selected_model, fallback_provider, fallback_model, temperature, max_tokens)
-                 VALUES (%s,'ollama','gemma3:1b','ollama','gemma3:1b',0.7,2048)""", (college_id,))
+                 VALUES (%s,'ollama','gemma4:e4b','ollama','gemma4:e4b',0.7,2048)""", (college_id,))
     conn.commit()
     print("   LLM config created")
 

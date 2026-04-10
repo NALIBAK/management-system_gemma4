@@ -72,8 +72,8 @@ INSERT IGNORE INTO user_account (username, password_hash, role_id, ref_type, is_
  (SELECT role_id FROM role WHERE role_name='super_admin'),
  'admin', 1);
 
--- LLM Config (defaults to Ollama with gemma3:1b — change in Settings → LLM Config)
--- Run: ollama pull gemma3:1b
+-- LLM Config (defaults to Ollama with gemma4:e4b — change in Settings → LLM Config)
+-- Run: ollama pull gemma4:e4b
 -- Alternatively pull any model and update selected_model here or via the UI
 INSERT IGNORE INTO llm_config (college_id, provider, selected_model, fallback_provider, fallback_model, temperature, max_tokens) VALUES
-(1, 'ollama', 'gemma3:1b', 'ollama', 'gemma3:1b', 0.7, 2048);
+(1, 'ollama', 'gemma4:e4b', 'ollama', 'gemma4:e4b', 0.7, 2048);

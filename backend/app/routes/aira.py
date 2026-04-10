@@ -1577,13 +1577,13 @@ def save_config():
                    fallback_provider=%s, fallback_model=%s, temperature=%s, max_tokens=%s, updated_at=NOW()
                    WHERE config_id=%s""",
                 (data.get("provider"), data.get("api_key"), data.get("selected_model"),
-                 data.get("fallback_provider", "ollama"), data.get("fallback_model", "gemma3:1b"),
+                 data.get("fallback_provider", "ollama"), data.get("fallback_model", "gemma4:e4b"),
                  data.get("temperature", 0.7), data.get("max_tokens", 2048), existing["config_id"]))
     else:
         execute("""INSERT INTO llm_config (provider, api_key_encrypted, selected_model, fallback_provider, fallback_model, temperature, max_tokens)
                    VALUES (%s,%s,%s,%s,%s,%s,%s)""",
                 (data.get("provider"), data.get("api_key"), data.get("selected_model"),
-                 data.get("fallback_provider", "ollama"), data.get("fallback_model", "gemma3:1b"),
+                 data.get("fallback_provider", "ollama"), data.get("fallback_model", "gemma4:e4b"),
                  data.get("temperature", 0.7), data.get("max_tokens", 2048)))
     return success(message="LLM configuration saved")
 
