@@ -12,6 +12,8 @@ Dependencies (qrcode, Pillow) are installed via:
 """
 
 import sys
+try: sys.stdout.reconfigure(encoding='utf-8')
+except AttributeError: pass
 import os
 import socket
 import subprocess
@@ -26,9 +28,9 @@ ROOT       = os.path.dirname(os.path.abspath(__file__))
 BACKEND    = os.path.join(ROOT, "backend")
 FRONTEND   = os.path.join(ROOT, "frontend")
 WHATSAPP   = os.path.join(ROOT, "whatsapp_service")
-BACKEND_PORT  = 5000
-FRONTEND_PORT = 8000
-WHATSAPP_PORT = 3001
+BACKEND_PORT  = 6000
+FRONTEND_PORT = 9000
+WHATSAPP_PORT = 4000
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 def get_lan_ip():

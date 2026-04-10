@@ -252,7 +252,7 @@
     // ── Card builders ─────────────────────────────────────────
     function reportCard(data) {
         const icon = (data.format || '').toLowerCase() === 'excel' ? '📊' : '📄';
-        const baseUrl = 'http://localhost:5000';
+        const baseUrl = 'http://localhost:6000';
         return `
       <div class="aira-card">
         <div class="aira-card-title">${icon} ${escHtml(data.filename || 'report')}</div>

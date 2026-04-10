@@ -1119,7 +1119,7 @@ def _smart_fallback(message: str, user: dict, messages: list = None) -> str:
                 res = execute_tool("generate_report", {"report_type": "cgpa", "format": fmt, **args}, user)
                 label = f"{dept_label} " if dept_label else ""
                 if res.get("response_type") == "report":
-                    return f"✅ **{label}Student Report Generated**\n\nClick here to download: [{res['filename']}](http://localhost:5000{res['download_url']})"
+                    return f"✅ **{label}Student Report Generated**\n\nClick here to download: [{res['filename']}](http://localhost:6000{res['download_url']})"
                 return "❌ Failed to generate the department student report."
             else:
                 # Just show in chat
@@ -1184,7 +1184,7 @@ def _smart_fallback(message: str, user: dict, messages: list = None) -> str:
             if rt:
                 res = execute_tool("generate_report", {"report_type": rt, "format": fmt}, user)
                 if res.get("response_type") == "report":
-                    return f"✅ **Report Generated Successfully**\n\nClick here to download: [{res['filename']}](http://localhost:5000{res['download_url']})"
+                    return f"✅ **Report Generated Successfully**\n\nClick here to download: [{res['filename']}](http://localhost:6000{res['download_url']})"
                 return "❌ Failed to generate report file."
 
         # CGPA / Student Profile Report
@@ -1750,7 +1750,7 @@ def _execute_send_whatsapp_notification(tool_args: dict, user: dict) -> dict:
     if not numbers or not message:
         return {"error": "Phone numbers and message are required."}
         
-    NODE_SERVICE_URL = "http://localhost:3001"
+    NODE_SERVICE_URL = "http://localhost:4000"
     success_count = 0
     failures = []
     

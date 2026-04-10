@@ -4,7 +4,7 @@ import logging
 from app.utils.auth import login_required
 
 whatsapp_bp = Blueprint('whatsapp', __name__)
-NODE_SERVICE_URL = "http://localhost:3001"
+NODE_SERVICE_URL = "http://localhost:4000"
 
 @whatsapp_bp.route('/status', methods=['GET'])
 @login_required

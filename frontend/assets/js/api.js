@@ -4,10 +4,10 @@
 
 // Dynamically resolve backend URL based on current page hostname.
 // This makes the app work from any device: localhost, LAN IP, or public tunnel URL.
-// Backend always runs on port 5000; only the hostname changes.
+// Backend always runs on port 6000; only the hostname changes.
 const _apiHost = window.location.hostname;
 const _apiProtocol = window.location.protocol;
-const API_BASE = `${_apiProtocol}//${_apiHost}:5000/api`;
+const API_BASE = `${_apiProtocol}//${_apiHost}:6000/api`;
 
 const api = {
   _getToken() {

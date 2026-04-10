@@ -70,7 +70,7 @@ def send_notification():
     sent_count = 0
     failures = []
     import requests
-    NODE_SERVICE_URL = "http://localhost:3001"
+    NODE_SERVICE_URL = "http://localhost:4000"
     
     for student_id in student_ids:
         # Get student info for placeholder substitution

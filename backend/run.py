@@ -13,4 +13,4 @@ def list_routes():
     return "<pre>" + "\n".join(sorted(output)) + "</pre>"
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=6000, debug=True)
