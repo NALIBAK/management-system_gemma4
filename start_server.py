@@ -4,8 +4,8 @@ start_server.py — College Management System Network Launcher
 Run from backend so the uv virtual environment is used:
 
   cd backend
-  uv run python ..\start_server.py           # LAN access only
-  uv run python ..\start_server.py --tunnel  # LAN + internet tunnel
+  uv run python ..\\start_server.py           # LAN access only
+  uv run python ..\\start_server.py --tunnel  # LAN + internet tunnel
 
 Dependencies (qrcode, Pillow) are installed via:
   uv pip install -r requirements.txt
