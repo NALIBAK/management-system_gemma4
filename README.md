@@ -1,6 +1,6 @@
 # College Management System (CMS) — Powered by Gemma 4
 
-![CMS Architecture Banner](frontend/assets/img/icon.png)
+
 
 A fully open-source, offline-first College Management System designed to bridge the data-analytics gap in institutions worldwide, powered completely locally by **Google's Gemma 4**.
 
@@ -44,8 +44,6 @@ Requires [uv Python manager](https://github.com/astral-sh/uv) and Node.js.
 2. **Start Ollama Locally**:
    Ensure Ollama is running on port 11434 with Gemma 4 installed:
    ```bash
-   ollama run gemma4:e4b
-   # Or for heavier hardware:
    ollama run gemma4:e4b
    ```
 
