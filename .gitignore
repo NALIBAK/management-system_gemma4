@@ -1,9 +1,9 @@
 # Node.js
-Main/whatsapp_service/node_modules/
-Main/whatsapp_service/whatsapp_auth/
-Main/whatsapp_service/.wwebjs_auth/
-Main/whatsapp_service/.wwebjs_cache/
-Main/whatsapp_service/package-lock.json
+whatsapp_service/node_modules/
+whatsapp_service/whatsapp_auth/
+whatsapp_service/.wwebjs_auth/
+whatsapp_service/.wwebjs_cache/
+whatsapp_service/package-lock.json
 
 # Python
 __pycache__/
@@ -12,7 +12,7 @@ __pycache__/
 .venv/
 env/
 venv/
-Main/Backend/reports_archive/
+backend/reports_archive/
 
 # Logs and databases
 *.log
