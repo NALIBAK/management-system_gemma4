@@ -1478,6 +1478,23 @@ def get_ollama_models():
     except Exception as e:
         return error(f"Could not reach Ollama at {ollama_url}: {str(e)}", 503)
 
+import ai_client
+
+@aira_bp.route("/test", methods=["GET"])
+@login_required
+def test_aira_connection():
+    """Verify if AIRA (Ollama backend) is reachable and model is available."""
+    if not ai_client.check_ollama_status():
+        return error("Could not connect to Ollama. Is it running?")
+        
+    cfg = ai_client._get_active_config()
+    model = cfg.get("model", ai_client.DEFAULT_MODEL)
+    
+    if not ai_client.check_model_exists(model):
+        return error(f"Ollama is running, but model '{model}' is not found.")
+        
+    return success(message=f"Connection successful to {model}")
+
 @aira_bp.route("/execute-tool", methods=["POST"])
 @login_required
 def run_tool():

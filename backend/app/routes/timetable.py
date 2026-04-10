@@ -9,22 +9,37 @@ timetable_bp = Blueprint("timetable", __name__)
 @login_required
 def get_timetable():
     section_id = request.args.get("section_id")
+    staff_id = request.args.get("staff_id")
     ay_id = request.args.get("academic_year_id")
-    if not section_id:
-        return error("section_id is required")
+    
+    if not section_id and not staff_id:
+        return error("Either section_id or staff_id is required")
+        
     sql = """SELECT t.*, sub.name as subject_name, sub.code as subject_code,
              s.name as staff_name, r.name as room_name, p.period_number,
-             p.start_time, p.end_time, p.label as period_label
+             p.start_time, p.end_time, p.label as period_label,
+             sec.name as section_name, c.name as course_name
              FROM timetable t
              JOIN subject sub ON t.subject_id=sub.subject_id
              JOIN staff s ON t.staff_id=s.staff_id
              LEFT JOIN room r ON t.room_id=r.room_id
              JOIN period_definition p ON t.period_id=p.period_id
-             WHERE t.section_id=%s"""
-    params = [section_id]
+             JOIN section sec ON t.section_id=sec.section_id
+             JOIN course c ON sec.course_id=c.course_id
+             WHERE 1=1"""
+    params = []
+    
+    if section_id:
+        sql += " AND t.section_id=%s"
+        params.append(section_id)
+    if staff_id:
+        sql += " AND t.staff_id=%s"
+        params.append(staff_id)
     if ay_id:
-        sql += " AND t.academic_year_id=%s"; params.append(ay_id)
-    sql += " ORDER BY FIELD(t.day_of_week,'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'), p.period_number"
+        sql += " AND t.academic_year_id=%s"
+        params.append(ay_id)
+        
+    sql += " ORDER BY FIELD(t.day_of_week,'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'), p.period_number"
     return success(query(sql, params))
 
 @timetable_bp.route("/", methods=["POST"])
