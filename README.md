@@ -1,6 +1,6 @@
 # College Management System (CMS) — Powered by Gemma 4
 
-
+![CMS Cover](docs/assets/cover_image.png)
 
 A fully open-source, offline-first College Management System designed to bridge the data-analytics gap in institutions worldwide, powered completely locally by **Google's Gemma 4**.
 
@@ -111,6 +111,22 @@ Requires [uv Python manager](https://github.com/astral-sh/uv), Node.js, and **XA
 - Frontend: HTML5, CSS3, Vanilla ES6 JavaScript (No compilation overhead)
 - Backend: Python 3.10+, Flask, PyMySQL (XAMPP target)
 - AI: Google Gemma 4 via Ollama REST API
+
+## Try AIRA — Example Prompts for Judges
+
+Log in as `superadmin / Admin@123` and open AIRA (the chat button in the bottom right). Try:
+
+```
+"Show me all students with less than 75% attendance"
+"Who are the top 10 students by CGPA?"
+"How many fee defaulters do we have? Generate a beautiful PDF report."
+"Give me a college dashboard summary"
+"Find student named Priya"
+"Mark Raj absent for Database Management today"
+"Send a WhatsApp alert to all fee defaulters about pending payments"
+```
+
+Each query triggers Gemma 4 function calling → live MySQL query → LLM synthesis → formatted markdown response. No RAG, no cache, no hallucination.
 
 ## Hackathon Evaluation Guide
 Please refer to [docs/HACKATHON.md](docs/HACKATHON.md) for a complete breakdown of how this repository fulfills the 30% Innovation, 30% Impact, 25% Execution, and 15% Accessibility (Offline-first) constraints.

@@ -245,8 +245,8 @@ MCP_TOOLS = [
         "inputSchema": {"type": "object", "properties": {}}
     },
     {
-        "name": "get_student_info",
-        "description": "Get detailed private profile of a specific student including email and phone number.",
+        "name": "get_student_profile_detail",
+        "description": "Get detailed private profile of a specific student including email and phone number. Use this when the admin needs full contact details.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -1119,7 +1119,7 @@ def _smart_fallback(message: str, user: dict, messages: list = None) -> str:
                 res = execute_tool("generate_report", {"report_type": "cgpa", "format": fmt, **args}, user)
                 label = f"{dept_label} " if dept_label else ""
                 if res.get("response_type") == "report":
-                    return f"✅ **{label}Student Report Generated**\n\nClick here to download: [{res['filename']}](http://localhost:5000{res['download_url']})"
+                    return f"✅ **{label}Student Report Generated**\n\nClick here to download: [{res['filename']}]({res['download_url']})"
                 return "❌ Failed to generate the department student report."
             else:
                 # Just show in chat
@@ -1184,7 +1184,7 @@ def _smart_fallback(message: str, user: dict, messages: list = None) -> str:
             if rt:
                 res = execute_tool("generate_report", {"report_type": rt, "format": fmt}, user)
                 if res.get("response_type") == "report":
-                    return f"✅ **Report Generated Successfully**\n\nClick here to download: [{res['filename']}](http://localhost:5000{res['download_url']})"
+                    return f"✅ **Report Generated Successfully**\n\nClick here to download: [{res['filename']}]({res['download_url']})"
                 return "❌ Failed to generate report file."
 
         # CGPA / Student Profile Report
