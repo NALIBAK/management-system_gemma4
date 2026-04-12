@@ -912,12 +912,10 @@ def _get_category_context() -> str:
     except:
         return "  Category data unavailable.\n"
 
-from aira.router import route_query
-
-
 @aira_bp.route("/chat", methods=["POST"])
 @login_required
 def chat():
+    from aira.router import route_query
     data = request.get_json()
     message = data.get("message", "")
     conversation_id = data.get("conversation_id")

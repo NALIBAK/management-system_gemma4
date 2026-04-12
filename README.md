@@ -77,16 +77,24 @@ Requires [uv Python manager](https://github.com/astral-sh/uv), Node.js, and **XA
 > [!WARNING]
 > If you are testing the **PDF Generation** feature on Windows, you must install the **GTK3** runtime environment. (Linux/macOS typically have this native).
 
-1. **Clone the repository:**
+### 1. Prerequisites
+- **Python 3.10+** with `uv` package manager (`pip install uv`)
+- **Node.js 18+** for the WhatsApp microservice
+- **Ollama** installed locally
+- **XAMPP** (or equivalent local MySQL server)
+
+### 2. Services Initialization
+
+1. **Pull the AI Model & Start Database**
+   ```bash
+   ollama pull gemma4:e4b
+   # Important: Start your XAMPP Control Panel and start the MySQL and Apache modules!
+   ```
+
+2. **Clone the repository:**
    ```bash
    git clone https://github.com/NALIBAK/management-system.git management-system_gemma4
    cd management-system_gemma4
-   ```
-
-2. **Start Ollama Locally**:
-   Ensure Ollama is running on port 11434 with Gemma 4 installed:
-   ```bash
-   ollama run gemma4:e4b
    ```
 
 3. **Initialize Database (Crucial First Step)**:
